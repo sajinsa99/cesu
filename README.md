@@ -2,7 +2,6 @@
 
 > Automated calculation of monthly CESU (Chèque Emploi Service Universel) salary with French labor law compliant bonuses.
 
-[![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline-blue?logo=jenkins)](https://www.jenkins.io/)
 [![Python](https://img.shields.io/badge/Python-3.6%2B-blue?logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![France](https://img.shields.io/badge/Region-France-blue)](https://www.service-public.fr/particuliers/vosdroits/F2107)
@@ -14,13 +13,9 @@
 - [Overview](#overview)
 - [Features](#features)
 - [Quick Start](#quick-start)
-  - [Jenkins Pipeline](#jenkins-pipeline)
-  - [Python Script](#python-script)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Jenkins Pipeline Usage](#jenkins-pipeline-usage)
-  - [Python Script Usage](#python-script-usage)
 - [Configuration](#configuration)
 - [Calculation Methodology](#calculation-methodology)
 - [Example Output](#example-output)
@@ -31,12 +26,9 @@
 
 ## Overview
 
-This project provides two ways to automate the calculation of monthly salaries for CESU-based employment contracts in France:
+This project provides a Python script to automate the calculation of monthly salaries for CESU-based employment contracts in France.
 
-1. **Jenkins Pipeline** - For automated CI/CD integration
-2. **Python Script** - For standalone command-line usage
-
-Both implementations account for:
+The script accounts for:
 
 - Variable monthly durations
 - Sunday premium rates
@@ -62,15 +54,6 @@ Both implementations account for:
 
 ## Quick Start
 
-### Jenkins Pipeline
-
-```bash
-# Add to Jenkins, configure pipeline from SCM, and run
-# Select month and adjust parameters as needed
-```
-
-### Python Script
-
 ```bash
 # Run with defaults (current month)
 python3 cesu.py
@@ -86,12 +69,6 @@ python3 cesu.py --help
 
 ## Prerequisites
 
-### Jenkins Pipeline
-- Jenkins 2.x or higher
-- Groovy sandbox enabled
-- Access to Git repository
-
-### Python Script
 - Python 3.6 or higher
 - No additional packages required (uses standard library only)
 
@@ -106,15 +83,6 @@ git clone https://github.com/your-username/cesu-calculator.git
 cd cesu-calculator
 ```
 
-### Jenkins Pipeline Setup
-
-1. **Create a new Pipeline job** in Jenkins
-2. **Configure Pipeline source**:
-   - Select "Pipeline script from SCM"
-   - Choose your SCM (Git)
-   - Point to this repository
-3. **Save and run** the pipeline
-
 ### Python Script Setup
 
 ```bash
@@ -128,19 +96,6 @@ python3 cesu.py
 ---
 
 ## Usage
-
-### Jenkins Pipeline Usage
-
-1. Navigate to your Jenkins job
-2. Click "Build with Parameters"
-3. Configure parameters:
-   - **SALARY_NETT**: Hourly rate (default: 12€)
-   - **TRANSPORT**: Monthly transport allowance (default: 60€)
-   - **NB_ABSENT_DAYS**: Number of absent days (default: 0)
-   - **MONTH**: Select 0 for current month or 1-12 for specific month
-4. Click "Build"
-
-### Python Script Usage
 
 #### Command-Line Options
 
@@ -178,15 +133,6 @@ python3 cesu.py --help
 
 ## Configuration
 
-### Pipeline Parameters
-
-| Parameter | Type | Default | Description |
-|:----------|:-----|:-------:|:------------|
-| `SALARY_NETT` | `string` | `12` | Hourly net rate in euros (€/h) |
-| `TRANSPORT` | `string` | `60` | Monthly transport allowance in euros (€) |
-| `NB_ABSENT_DAYS` | `string` | `0` | Number of absent days to deduct |
-| `MONTH` | `choice` | `0` | Month (0=Current, 1-12 for specific) |
-
 ### Holiday Data
 
 The ICS file is automatically downloaded from:
@@ -195,7 +141,6 @@ https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics
 ```
 
 - Python script auto-downloads if missing
-- Jenkins pipeline uses local file or embedded fallback data
 - Data maintained by [Etalab](https://www.etalab.gouv.fr/)
 
 ---
@@ -232,7 +177,6 @@ TOTAL_SALARY = ((TOTAL_HOURS × SALARY_NETT) × 1.10) + TRANSPORT
 
 **Input**: Month 6 (June 2026) with 30 days, 4 Sundays, 5 Thursdays, 1 public holiday, 0 absent days
 
-**Python Script:**
 ```
 $ python3 cesu.py --m 6
 
@@ -263,45 +207,9 @@ TOTAL SALARY: 535.20€
 ==========================================
 ```
 
-**Jenkins Pipeline:**
-```
-=== SALARY CALCULATION FOR 6/2026 ===
-Days in month: 30
-Loaded ICS from workspace: 15324 bytes
-Public holidays in month 6/2026: [8]
-Sundays: [7, 14, 21, 28] (count: 4)
-Thursdays: [4, 11, 18, 25] (count: 4)
-
-=== HOURS BREAKDOWN ===
-Base hours (1 per day): 30
-Sunday bonus (+1 per Sunday): +4
-Holiday bonus (+1 per holiday): +1
-Thursday bonus (25% per Thursday): +1.0
-Absent days: -0
-TOTAL HOURS: 36.0
-
-=== SALARY BREAKDOWN ===
-Base salary (36.0 hours x 12€): 432.0€
-With 10% bonus: 475.2€
-Transport allowance: +60€
-
-==========================================
-TOTAL SALARY: 535.20€
-==========================================
-```
-
 ---
 
 ## API Reference
-
-### Environment Variables (Jenkins Output)
-
-After pipeline execution, the following environment variables are available for downstream jobs:
-
-| Variable | Type | Description |
-|:---------|:-----|:------------|
-| `TOTAL_HOURS` | `string` | Computed total hours |
-| `TOTAL_SALARY` | `string` | Final salary amount (formatted) |
 
 ### Python Script Exit Codes
 
@@ -316,8 +224,7 @@ After pipeline execution, the following environment variables are available for 
 
 | File | Description |
 |:-----|:------------|
-| `Jenkinsfile` | Jenkins pipeline definition |
-| `cesu.py` | Standalone Python script |
+| `cesu.py` | Python script for salary calculation |
 | `jours_feries_metropole.ics` | French public holidays (ICS format, auto-downloaded) |
 | `README.md` | This documentation |
 
@@ -342,5 +249,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  <sub>Built with Jenkins & Python</sub>
+  <sub>Built with Python</sub>
 </p>
