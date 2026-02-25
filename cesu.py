@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-CESU Salary Calculator
+Calculateur de Salaire CESU
 
-Automated calculation of monthly CESU (Chèque Emploi Service Universel) salary
-with French labor law compliant bonuses.
+Calcul automatisé du salaire mensuel CESU (Chèque Emploi Service Universel)
+conforme aux dispositions du droit du travail français.
 
-This script computes the total salary based on:
-- Base hours (1 hour per day)
-- Sunday premium rates (x2)
-- French public holiday bonuses (x2)
-- Thursday scheduling considerations (+25%, rounded up)
-- Absent days deduction
-- 10% bonus
-- Transport allowance
+Ce script calcule le salaire total en tenant compte de :
+- Heures de base (1 heure par jour)
+- Majoration dominicale (×2)
+- Majoration pour jours fériés (×2)
+- Majoration des jeudis (+25%, arrondi au supérieur)
+- Déduction des jours d'absence
+- Prime de 10%
+- Indemnité de transport
 """
 
 import argparse
@@ -28,63 +28,63 @@ from urllib.error import URLError
 
 def download_ics_file(url, destination):
     """
-    Download ICS file from URL.
+    Télécharge un fichier ICS depuis une URL.
 
     Args:
-        url (str): URL to download from
-        destination (str): Local file path to save to
+        url (str): URL source du téléchargement
+        destination (str): Chemin local de destination
 
     Returns:
-        bool: True if successful, False otherwise
+        bool: True si réussi, False sinon
     """
     try:
-        print(f"Downloading holidays data from {url}...")
+        print(f"Téléchargement des données de jours fériés depuis {url}...")
         with urlopen(url, timeout=30) as response:
             content = response.read().decode('utf-8')
 
         with open(destination, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        print(f"Successfully downloaded to {destination}")
+        print(f"Téléchargement réussi vers {destination}")
         return True
 
     except URLError as e:
-        print(f"Warning: Could not download ICS file: {e}", file=sys.stderr)
+        print(f"Avertissement : Impossible de télécharger le fichier ICS : {e}", file=sys.stderr)
         return False
     except Exception as e:
-        print(f"Warning: Error downloading ICS file: {e}", file=sys.stderr)
+        print(f"Avertissement : Erreur lors du téléchargement du fichier ICS : {e}", file=sys.stderr)
         return False
 
 
 def parse_ics_holidays(ics_file, year, month):
     """
-    Parse ICS file to extract French public holidays for a specific month.
-    If file doesn't exist locally, attempts to download it.
+    Analyse un fichier ICS pour extraire les jours fériés français d'un mois spécifique.
+    Si le fichier n'existe pas localement, tente de le télécharger.
 
     Args:
-        ics_file (str): Path to the ICS file
-        year (int): Target year
-        month (int): Target month (1-12)
+        ics_file (str): Chemin vers le fichier ICS
+        year (int): Année ciblée
+        month (int): Mois ciblé (1-12)
 
     Returns:
-        list: List of day numbers (int) for holidays in the specified month
+        list: Liste des numéros de jours (int) fériés dans le mois spécifié
     """
     holidays = []
     ics_url = 'https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics'
 
-    # If file doesn't exist, try to download it
+    # Téléchargement du fichier s'il n'existe pas localement
     if not Path(ics_file).exists():
-        print(f"ICS file '{ics_file}' not found locally.")
+        print(f"Fichier ICS '{ics_file}' introuvable localement.")
         if not download_ics_file(ics_url, ics_file):
-            print("Continuing without holidays data.", file=sys.stderr)
+            print("Poursuite du calcul sans les données de jours fériés.", file=sys.stderr)
             return []
 
     try:
         with open(ics_file, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Match DTSTART lines with 8-digit date pattern (YYYYMMDD)
-        # Format can be: DTSTART:20260501 or DTSTART;VALUE=DATE:20260501
+        # Recherche des lignes DTSTART avec format de date à 8 chiffres (AAAAMMJJ)
+        # Format possible : DTSTART:20260501 ou DTSTART;VALUE=DATE:20260501
         pattern = r'DTSTART[;:].*?(\d{8})'
         matches = re.findall(pattern, content)
 
@@ -100,24 +100,24 @@ def parse_ics_holidays(ics_file, year, month):
         return sorted(holidays)
 
     except FileNotFoundError:
-        print(f"Warning: ICS file '{ics_file}' not found. Continuing without holidays.", file=sys.stderr)
+        print(f"Avertissement : Fichier ICS '{ics_file}' introuvable. Poursuite du calcul sans les jours fériés.", file=sys.stderr)
         return []
     except Exception as e:
-        print(f"Warning: Could not parse ICS file: {e}", file=sys.stderr)
+        print(f"Avertissement : Impossible d'analyser le fichier ICS : {e}", file=sys.stderr)
         return []
 
 
 def get_weekday_occurrences(year, month, weekday):
     """
-    Get all occurrences of a specific weekday in a month.
+    Récupère toutes les occurrences d'un jour de la semaine spécifique dans un mois.
 
     Args:
-        year (int): Target year
-        month (int): Target month (1-12)
-        weekday (int): Weekday (0=Monday, 6=Sunday)
+        year (int): Année ciblée
+        month (int): Mois ciblé (1-12)
+        weekday (int): Jour de la semaine (0=Lundi, 6=Dimanche)
 
     Returns:
-        list: List of day numbers for the specified weekday
+        list: Liste des numéros de jours correspondant au jour de la semaine spécifié
     """
     days = []
     cal = calendar.monthcalendar(year, month)
@@ -131,76 +131,76 @@ def get_weekday_occurrences(year, month, weekday):
 
 def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jours_feries_metropole.ics'):
     """
-    Calculate monthly CESU salary with all bonuses.
+    Calcule le salaire mensuel CESU avec toutes les majorations.
 
     Args:
-        month (int): Month (1-12)
-        salary_nett (float): Net hourly salary
-        nb_absent_days (int): Number of absent days
-        transport (float): Transport allowance
-        ics_file (str): Path to ICS holidays file
+        month (int): Mois (1-12)
+        salary_nett (float): Salaire horaire net
+        nb_absent_days (int): Nombre de jours d'absence
+        transport (float): Indemnité de transport
+        ics_file (str): Chemin vers le fichier ICS des jours fériés
 
     Returns:
-        dict: Calculation results with breakdown
+        dict: Résultats du calcul avec détails
     """
     current_year = datetime.now().year
 
-    # Get number of days in the month
+    # Récupération du nombre de jours dans le mois
     days_in_month = calendar.monthrange(current_year, month)[1]
 
-    print(f"\n=== SALARY CALCULATION FOR {month}/{current_year} ===")
-    print(f"Days in month: {days_in_month}")
+    print(f"\n=== CALCUL DE SALAIRE POUR {month}/{current_year} ===")
+    print(f"Nombre de jours dans le mois : {days_in_month}")
 
-    # Load public holidays from ICS file
+    # Chargement des jours fériés depuis le fichier ICS
     holidays = parse_ics_holidays(ics_file, current_year, month)
-    print(f"Public holidays in month {month}/{current_year}: {holidays}")
+    print(f"Jours fériés du mois {month}/{current_year} : {holidays}")
 
-    # Count Sundays (weekday 6) and Thursdays (weekday 3)
-    sundays = get_weekday_occurrences(current_year, month, 6)  # Sunday
-    thursdays = get_weekday_occurrences(current_year, month, 3)  # Thursday
+    # Comptage des dimanches (jour 6) et des jeudis (jour 3)
+    sundays = get_weekday_occurrences(current_year, month, 6)  # Dimanche
+    thursdays = get_weekday_occurrences(current_year, month, 3)  # Jeudi
 
-    print(f"Sundays: {sundays} (count: {len(sundays)})")
-    print(f"Thursdays: {thursdays} (count: {len(thursdays)})")
+    print(f"Dimanches : {sundays} (total : {len(sundays)})")
+    print(f"Jeudis : {thursdays} (total : {len(thursdays)})")
 
-    # Calculate hours
-    # Base: 1 day = 1 hour
+    # Calcul des heures
+    # Base : 1 jour = 1 heure
     total_hours = float(days_in_month)
 
-    # Sundays: x2 (add extra hour for each Sunday)
+    # Dimanches : ×2 (ajout d'une heure supplémentaire par dimanche)
     sunday_bonus = len(sundays)
     total_hours += sunday_bonus
 
-    # Public holidays: x2 (add extra hour for each holiday)
+    # Jours fériés : ×2 (ajout d'une heure supplémentaire par jour férié)
     holiday_bonus = len(holidays)
     total_hours += holiday_bonus
 
-    # Thursdays: +25% (rounded up)
+    # Jeudis : +25% (arrondi au supérieur)
     thursday_bonus = ceil(len(thursdays) * 0.25)
     total_hours += thursday_bonus
 
-    # Subtract absent days
+    # Soustraction des jours d'absence
     total_hours -= nb_absent_days
 
-    print("\n=== HOURS BREAKDOWN ===")
-    print(f"Base hours (1 per day): {days_in_month}")
-    print(f"Sunday bonus (+1 per Sunday): +{sunday_bonus}")
-    print(f"Holiday bonus (+1 per holiday): +{holiday_bonus}")
-    print(f"Thursday bonus (25% per Thursday): +{thursday_bonus}")
-    print(f"Absent days: -{nb_absent_days}")
-    print(f"TOTAL HOURS: {total_hours}")
+    print("\n=== DÉTAIL DES HEURES ===")
+    print(f"Heures de base (1 par jour) : {days_in_month}")
+    print(f"Majoration dimanches (+1 par dimanche) : +{sunday_bonus}")
+    print(f"Majoration jours fériés (+1 par jour férié) : +{holiday_bonus}")
+    print(f"Majoration jeudis (25% par jeudi) : +{thursday_bonus}")
+    print(f"Jours d'absence : -{nb_absent_days}")
+    print(f"TOTAL DES HEURES : {total_hours}")
 
-    # Calculate salary
-    # TOTAL_SALARY = ((TOTAL_HOURS × SALARY_NETT) + 10%) + TRANSPORT
+    # Calcul du salaire
+    # SALAIRE_TOTAL = ((TOTAL_HEURES × SALAIRE_NET) + 10%) + TRANSPORT
     base_salary = total_hours * salary_nett
     with_bonus = base_salary * 1.10  # +10%
     total_salary = with_bonus + transport
 
-    print("\n=== SALARY BREAKDOWN ===")
-    print(f"Base salary ({total_hours} hours × {salary_nett}€): {base_salary:.2f}€")
-    print(f"With 10% bonus: {with_bonus:.2f}€")
-    print(f"Transport allowance: +{transport:.2f}€")
+    print("\n=== DÉTAIL DU SALAIRE ===")
+    print(f"Salaire de base ({total_hours} heures × {salary_nett}€) : {base_salary:.2f}€")
+    print(f"Avec prime de 10% : {with_bonus:.2f}€")
+    print(f"Indemnité de transport : +{transport:.2f}€")
     print("\n" + "=" * 42)
-    print(f"TOTAL SALARY: {total_salary:.2f}€")
+    print(f"SALAIRE TOTAL : {total_salary:.2f}€")
     print("=" * 42 + "\n")
 
     return {
@@ -217,17 +217,17 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
 
 
 def main():
-    """Main entry point for the CESU salary calculator."""
+    """Point d'entrée principal du calculateur de salaire CESU."""
     parser = argparse.ArgumentParser(
-        description='CESU Salary Calculator - Calculate monthly salary with French labor law bonuses',
+        description='Calculateur de Salaire CESU - Calcul du salaire mensuel conforme au droit du travail français',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  %(prog)s                                    # Calculate for current month with defaults
-  %(prog)s --m 3 --sn 15 --t 80              # Calculate for March with custom values
-  %(prog)s --m 6 --nb-a-d 2                  # Calculate for June with 2 absent days
+Exemples :
+  %(prog)s                                    # Calcul pour le mois en cours avec les valeurs par défaut
+  %(prog)s --m 3 --sn 15 --t 80              # Calcul pour mars avec des valeurs personnalisées
+  %(prog)s --m 6 --nb-a-d 2                  # Calcul pour juin avec 2 jours d'absence
 
-For more information, visit: https://github.com/your-repo/cesu-calculator
+Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculator
         """
     )
 
@@ -236,55 +236,55 @@ For more information, visit: https://github.com/your-repo/cesu-calculator
         type=int,
         default=datetime.now().month,
         choices=range(1, 13),
-        metavar='MONTH',
-        help='Target month (1-12). Defaults to current month.'
+        metavar='MOIS',
+        help='Mois ciblé (1-12). Par défaut, le mois en cours'
     )
 
     parser.add_argument(
         '--sn', '--salary-nett',
         type=float,
         default=12.0,
-        metavar='AMOUNT',
-        help='Net hourly salary in euros (default: 12)'
+        metavar='MONTANT',
+        help='Salaire horaire net en euros (défaut : 12)'
     )
 
     parser.add_argument(
         '--nb-a-d', '--nb-absent-days',
         type=int,
         default=0,
-        metavar='DAYS',
-        help='Number of absent days to deduct (default: 0)'
+        metavar='JOURS',
+        help='Nombre de jours d\'absence à déduire (défaut : 0)'
     )
 
     parser.add_argument(
         '--t', '--transport',
         type=float,
         default=60.0,
-        metavar='AMOUNT',
-        help='Monthly transport allowance in euros (default: 60)'
+        metavar='MONTANT',
+        help='Indemnité de transport mensuelle en euros (défaut : 60)'
     )
 
     parser.add_argument(
         '--ics',
         type=str,
         default='jours_feries_metropole.ics',
-        metavar='FILE',
-        help='Path to ICS holidays file (default: jours_feries_metropole.ics)'
+        metavar='FICHIER',
+        help='Chemin vers le fichier ICS des jours fériés (défaut : jours_feries_metropole.ics)'
     )
 
     args = parser.parse_args()
 
-    # Validate inputs
+    # Validation des arguments
     if args.sn <= 0:
-        parser.error("Salary must be greater than 0")
+        parser.error("Le salaire doit être supérieur à 0")
 
     if args.nb_a_d < 0:
-        parser.error("Number of absent days cannot be negative")
+        parser.error("Le nombre de jours d'absence ne peut pas être négatif")
 
     if args.t < 0:
-        parser.error("Transport allowance cannot be negative")
+        parser.error("L'indemnité de transport ne peut pas être négative")
 
-    # Run calculation
+    # Exécution du calcul
     try:
         calculate_salary(
             month=args.m,
@@ -294,7 +294,7 @@ For more information, visit: https://github.com/your-repo/cesu-calculator
             ics_file=args.ics
         )
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        print(f"Erreur : {e}", file=sys.stderr)
         sys.exit(1)
 
 
