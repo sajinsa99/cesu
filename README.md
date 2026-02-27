@@ -1,131 +1,131 @@
-# CESU Salary Calculator
+# Calculateur de Salaire CESU
 
-> Automated calculation of monthly CESU (Chèque Emploi Service Universel) salary with French labor law compliant bonuses.
+> Calcul automatisé du salaire mensuel CESU (Chèque Emploi Service Universel) avec les primes conformes au droit du travail français.
 
 [![Python](https://img.shields.io/badge/Python-3.6%2B-blue?logo=python)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![France](https://img.shields.io/badge/Region-France-blue)](https://www.service-public.fr/particuliers/vosdroits/F2107)
+[![France](https://img.shields.io/badge/Région-France-blue)](https://www.service-public.fr/particuliers/vosdroits/F2107)
 
 ---
 
-## Table of Contents
+## Table des matières
 
-- [Overview](#overview)
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Prerequisites](#prerequisites)
+- [Vue d'ensemble](#vue-densemble)
+- [Fonctionnalités](#fonctionnalités)
+- [Démarrage rapide](#démarrage-rapide)
+- [Prérequis](#prérequis)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Utilisation](#utilisation)
 - [Configuration](#configuration)
-- [Calculation Methodology](#calculation-methodology)
-- [Example Output](#example-output)
-- [API Reference](#api-reference)
-- [Contributing](#contributing)
+- [Méthodologie de calcul](#méthodologie-de-calcul)
+- [Exemple de sortie](#exemple-de-sortie)
+- [Référence API](#référence-api)
+- [Contribuer](#contribuer)
 
 ---
 
-## Overview
+## Vue d'ensemble
 
-This project provides a Python script to automate the calculation of monthly salaries for CESU-based employment contracts in France.
+Ce projet fournit un script Python pour automatiser le calcul des salaires mensuels pour les contrats d'emploi CESU en France.
 
-The script accounts for:
+Le script prend en compte :
 
-- Variable monthly durations
-- Sunday premium rates
-- French public holiday bonuses
-- Thursday scheduling considerations
-- Absent days deduction
-- Transport allowances
-
----
-
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| **Dynamic Calendar** | Automatically determines days in selected month |
-| **Holiday Integration** | Fetches official French public holidays from government API |
-| **Bonus Calculation** | Applies legally compliant multipliers for special days |
-| **Absent Days Support** | Deducts absent days from total hours |
-| **Auto-download** | Python script automatically downloads holiday data if missing |
-| **No External Dependencies** | Python version uses only standard library |
+- La durée variable des mois
+- Les majorations pour les dimanches
+- Les primes pour les jours fériés
+- La prise en compte des jeudis
+- La déduction des jours d'absence
+- Les indemnités de transport
 
 ---
 
-## Quick Start
+## Fonctionnalités
+
+| Fonctionnalité | Description |
+|----------------|-------------|
+| **Calendrier dynamique** | Détermine automatiquement les jours du mois sélectionné |
+| **Intégration des jours fériés** | Récupère les jours fériés officiels depuis l'API gouvernementale |
+| **Calcul des primes** | Applique les coefficients légaux pour les jours spéciaux |
+| **Gestion des absences** | Déduit les jours d'absence du total d'heures |
+| **Téléchargement automatique** | Le script Python télécharge automatiquement les données de jours fériés si absentes |
+| **Aucune dépendance externe** | La version Python utilise uniquement la bibliothèque standard |
+
+---
+
+## Démarrage rapide
 
 ```bash
-# Run with defaults (current month)
+# Exécuter avec les valeurs par défaut (mois en cours)
 python3 cesu.py
 
-# Calculate for specific month with custom values
+# Calculer pour un mois spécifique avec des valeurs personnalisées
 python3 cesu.py --m 6 --sn 15 --t 80 --nb-a-d 2
 
-# View help
+# Afficher l'aide
 python3 cesu.py --help
 ```
 
 ---
 
-## Prerequisites
+## Prérequis
 
-- Python 3.6 or higher
-- No additional packages required (uses standard library only)
+- Python 3.6 ou supérieur
+- Aucun package supplémentaire requis (utilise uniquement la bibliothèque standard)
 
 ---
 
 ## Installation
 
-### Clone Repository
+### Cloner le dépôt
 
 ```bash
 git clone https://github.com/your-username/cesu-calculator.git
 cd cesu-calculator
 ```
 
-### Python Script Setup
+### Configuration du script Python
 
 ```bash
-# Make script executable (Linux/macOS)
+# Rendre le script exécutable (Linux/macOS)
 chmod +x cesu.py
 
-# Or run directly
+# Ou exécuter directement
 python3 cesu.py
 ```
 
 ---
 
-## Usage
+## Utilisation
 
-#### Command-Line Options
+#### Options en ligne de commande
 
-| Option | Long Form | Default | Description |
-|:-------|:----------|:-------:|:------------|
-| `--m` | `--month` | Current month | Target month (1-12) |
-| `--sn` | `--salary-nett` | `12.0` | Net hourly salary in euros |
-| `--nb-a-d` | `--nb-absent-days` | `0` | Number of absent days |
-| `--t` | `--transport` | `60.0` | Monthly transport allowance in euros |
-| `--ics` | | `jours_feries_metropole.ics` | Path to ICS holidays file |
+| Option | Forme longue | Défaut | Description |
+|:-------|:-------------|:------:|:------------|
+| `--m` | `--month` | Mois actuel | Mois cible (1-12) |
+| `--sn` | `--salary-nett` | `12.0` | Salaire horaire net en euros |
+| `--nb-a-d` | `--nb-absent-days` | `0` | Nombre de jours d'absence |
+| `--t` | `--transport` | `60.0` | Indemnité de transport mensuelle en euros |
+| `--ics` | | `jours_feries_metropole.ics` | Chemin vers le fichier ICS des jours fériés |
 
-#### Examples
+#### Exemples
 
 ```bash
-# Calculate for current month with all defaults
+# Calculer pour le mois en cours avec toutes les valeurs par défaut
 python3 cesu.py
 
-# Calculate for March
+# Calculer pour le mois de mars
 python3 cesu.py --m 3
 
-# Calculate with custom salary and transport
+# Calculer avec un salaire et transport personnalisés
 python3 cesu.py --sn 15 --t 80
 
-# Calculate for June with 2 absent days
+# Calculer pour juin avec 2 jours d'absence
 python3 cesu.py --m 6 --nb-a-d 2
 
-# Full custom calculation
+# Calcul entièrement personnalisé
 python3 cesu.py --m 12 --sn 14.50 --t 75 --nb-a-d 1
 
-# Display help
+# Afficher l'aide
 python3 cesu.py --help
 ```
 
@@ -133,49 +133,49 @@ python3 cesu.py --help
 
 ## Configuration
 
-### Holiday Data
+### Données des jours fériés
 
-The ICS file is automatically downloaded from:
+Le fichier ICS est automatiquement téléchargé depuis :
 ```
 https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics
 ```
 
-- Python script auto-downloads if missing
-- Data maintained by [Etalab](https://www.etalab.gouv.fr/)
+- Le script Python télécharge automatiquement les données si le fichier est absent
+- Données maintenues par [Etalab](https://www.etalab.gouv.fr/)
 
 ---
 
-## Calculation Methodology
+## Méthodologie de calcul
 
-### Hours Computation
+### Calcul des heures
 
-The total billable hours are computed using the following rules:
+Le total des heures facturables est calculé selon les règles suivantes :
 
-| Day Type | Multiplier | Description |
-|:---------|:----------:|:------------|
-| Regular Day | ×1 | Base rate: 1 hour per calendar day |
-| Sunday | ×2 | Double rate applied (+1 bonus hour) |
-| Public Holiday | ×2 | Double rate applied (+1 bonus hour) |
-| Thursday | +25% | Additional hours rounded up (ceil) |
-| Absent Day | -1 | Deducted from total |
+| Type de jour | Multiplicateur | Description |
+|:-------------|:--------------:|:------------|
+| Jour normal | ×1 | Taux de base : 1 heure par jour calendaire |
+| Dimanche | ×2 | Taux doublé appliqué (+1 heure de prime) |
+| Jour férié | ×2 | Taux doublé appliqué (+1 heure de prime) |
+| Jeudi | +25% | Heures supplémentaires arrondies au supérieur (ceil) |
+| Jour d'absence | -1 | Déduit du total |
 
-### Salary Formula
+### Formule de calcul du salaire
 
 ```
-BASE_HOURS = Days_in_Month
-BONUS_HOURS = Sundays + Holidays + ceil(Thursdays × 0.25)
-TOTAL_HOURS = BASE_HOURS + BONUS_HOURS - Absent_Days
+HEURES_BASE = Jours_du_mois
+HEURES_PRIME = Dimanches + Jours_fériés + ceil(Jeudis × 0.25)
+HEURES_TOTALES = HEURES_BASE + HEURES_PRIME - Jours_absence
 
-TOTAL_SALARY = ((TOTAL_HOURS × SALARY_NETT) × 1.10) + TRANSPORT
+SALAIRE_TOTAL = ((HEURES_TOTALES × SALAIRE_NET) × 1.10) + TRANSPORT
 ```
 
-> **Note**: The 10% bonus is applied as per standard CESU employment terms.
+> **Note** : Le bonus de 10% est appliqué conformément aux conditions standards d'emploi CESU.
 
 ---
 
-## Example Output
+## Exemple de sortie
 
-**Input**: Month 6 (June 2026) with 30 days, 4 Sundays, 5 Thursdays, 1 public holiday, 0 absent days
+**Entrée** : Mois 6 (juin 2026) avec 30 jours, 4 dimanches, 5 jeudis, 1 jour férié, 0 jour d'absence
 
 ```
 $ python3 cesu.py --m 6
@@ -209,45 +209,45 @@ TOTAL SALARY: 535.20€
 
 ---
 
-## API Reference
+## Référence API
 
-### Python Script Exit Codes
+### Codes de sortie du script Python
 
 | Code | Description |
 |:----:|:------------|
-| `0` | Successful calculation |
-| `1` | Error occurred (invalid parameters, file errors, etc.) |
+| `0` | Calcul réussi |
+| `1` | Erreur survenue (paramètres invalides, erreurs de fichier, etc.) |
 
 ---
 
-## Files
+## Fichiers
 
-| File | Description |
-|:-----|:------------|
-| `cesu.py` | Python script for salary calculation |
-| `jours_feries_metropole.ics` | French public holidays (ICS format, auto-downloaded) |
-| `README.md` | This documentation |
-
----
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+| Fichier | Description |
+|:--------|:------------|
+| `cesu.py` | Script Python pour le calcul du salaire |
+| `jours_feries_metropole.ics` | Jours fériés français (format ICS, téléchargé automatiquement) |
+| `README.md` | Cette documentation |
 
 ---
 
-## License
+## Contribuer
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Les contributions sont les bienvenues ! N'hésitez pas à soumettre une Pull Request.
+
+1. Forkez le dépôt
+2. Créez votre branche de fonctionnalité (`git checkout -b feature/NouvelleFonctionnalite`)
+3. Commitez vos changements (`git commit -m 'Ajout d'une nouvelle fonctionnalité'`)
+4. Poussez vers la branche (`git push origin feature/NouvelleFonctionnalite`)
+5. Ouvrez une Pull Request
+
+---
+
+## Licence
+
+Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
 <p align="center">
-  <sub>Built with Python</sub>
+  <sub>Développé avec Python</sub>
 </p>
