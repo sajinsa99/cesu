@@ -24,6 +24,10 @@ from math import ceil
 from pathlib import Path
 from urllib.request import urlopen
 from urllib.error import URLError
+import json
+
+# Constantes
+ICS_DEFAULT_URL = 'https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics'
 
 
 def download_ics_file(url, destination):
@@ -70,12 +74,11 @@ def parse_ics_holidays(ics_file, year, month):
         list: Liste des numéros de jours (int) fériés dans le mois spécifié
     """
     holidays = []
-    ics_url = 'https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics'
 
     # Téléchargement du fichier s'il n'existe pas localement
     if not Path(ics_file).exists():
         print(f"Fichier ICS '{ics_file}' introuvable localement.")
-        if not download_ics_file(ics_url, ics_file):
+        if not download_ics_file(ICS_DEFAULT_URL, ics_file):
             print("Poursuite du calcul sans les données de jours fériés.", file=sys.stderr)
             return []
 
@@ -129,7 +132,7 @@ def get_weekday_occurrences(year, month, weekday):
     return days
 
 
-def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jours_feries_metropole.ics'):
+def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jours_feries_metropole.ics', year=None, json_output=False):
     """
     Calcule le salaire mensuel CESU avec toutes les majorations.
 
@@ -139,28 +142,43 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
         nb_absent_days (int): Nombre de jours d'absence
         transport (float): Indemnité de transport
         ics_file (str): Chemin vers le fichier ICS des jours fériés
+        year (int): Année ciblée (None = année courante)
+        json_output (bool): Si True, affiche le résultat en JSON
 
     Returns:
         dict: Résultats du calcul avec détails
     """
-    current_year = datetime.now().year
+    current_year = year if year is not None else datetime.now().year
 
     # Récupération du nombre de jours dans le mois
     days_in_month = calendar.monthrange(current_year, month)[1]
-
-    print(f"\n=== CALCUL DE SALAIRE POUR {month}/{current_year} ===")
-    print(f"Nombre de jours dans le mois : {days_in_month}")
+    
+    # Validation du nombre de jours d'absence
+    if nb_absent_days > days_in_month:
+        raise ValueError(f"Le nombre de jours d'absence ({nb_absent_days}) ne peut pas dépasser le nombre de jours dans le mois ({days_in_month})")
+    
+    if not json_output:
+        print(f"\n=== CALCUL DE SALAIRE POUR {month}/{current_year} ===")
+        print(f"Nombre de jours dans le mois : {days_in_month}")
 
     # Chargement des jours fériés depuis le fichier ICS
     holidays = parse_ics_holidays(ics_file, current_year, month)
-    print(f"Jours fériés du mois {month}/{current_year} : {holidays}")
-
+    
     # Comptage des dimanches (jour 6) et des jeudis (jour 3)
     sundays = get_weekday_occurrences(current_year, month, 6)  # Dimanche
     thursdays = get_weekday_occurrences(current_year, month, 3)  # Jeudi
-
-    print(f"Dimanches : {sundays} (total : {len(sundays)})")
-    print(f"Jeudis : {thursdays} (total : {len(thursdays)})")
+    
+    # Filtrer les jours fériés qui tombent un dimanche pour éviter le double comptage
+    # Un jour férié tombant un dimanche bénéficie déjà de la majoration dimanche
+    holidays_not_sunday = [h for h in holidays if h not in sundays]
+    
+    if not json_output:
+        print(f"Jours fériés du mois {month}/{current_year} : {holidays}")
+        if len(holidays) != len(holidays_not_sunday):
+            print(f"  → Jours fériés tombant un dimanche (déjà majorés) : {[h for h in holidays if h in sundays]}")
+            print(f"  → Jours fériés à majorer : {holidays_not_sunday}")
+        print(f"Dimanches : {sundays} (total : {len(sundays)})")
+        print(f"Jeudis : {thursdays} (total : {len(thursdays)})")
 
     # Calcul des heures
     # Base : 1 jour = 1 heure
@@ -171,7 +189,8 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
     total_hours += sunday_bonus
 
     # Jours fériés : ×2 (ajout d'une heure supplémentaire par jour férié)
-    holiday_bonus = len(holidays)
+    # Uniquement pour les jours fériés ne tombant pas un dimanche
+    holiday_bonus = len(holidays_not_sunday)
     total_hours += holiday_bonus
 
     # Jeudis : +25% (arrondi au supérieur)
@@ -181,13 +200,14 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
     # Soustraction des jours d'absence
     total_hours -= nb_absent_days
 
-    print("\n=== DÉTAIL DES HEURES ===")
-    print(f"Heures de base (1 par jour) : {days_in_month}")
-    print(f"Majoration dimanches (+1 par dimanche) : +{sunday_bonus}")
-    print(f"Majoration jours fériés (+1 par jour férié) : +{holiday_bonus}")
-    print(f"Majoration jeudis (25% par jeudi) : +{thursday_bonus}")
-    print(f"Jours d'absence : -{nb_absent_days}")
-    print(f"TOTAL DES HEURES : {total_hours}")
+    if not json_output:
+        print("\n=== DÉTAIL DES HEURES ===")
+        print(f"Heures de base (1 par jour) : {days_in_month}")
+        print(f"Majoration dimanches (+1 par dimanche) : +{sunday_bonus}")
+        print(f"Majoration jours fériés (+1 par jour férié non-dimanche) : +{holiday_bonus}")
+        print(f"Majoration jeudis (25% par jeudi, arrondi supérieur) : +{thursday_bonus}")
+        print(f"Jours d'absence : -{nb_absent_days}")
+        print(f"TOTAL DES HEURES : {total_hours}")
 
     # Calcul du salaire
     # SALAIRE_TOTAL = ((TOTAL_HEURES × SALAIRE_NET) + 10%) + TRANSPORT
@@ -195,25 +215,40 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
     with_bonus = base_salary * 1.10  # +10%
     total_salary = with_bonus + transport
 
-    print("\n=== DÉTAIL DU SALAIRE ===")
-    print(f"Salaire de base ({total_hours} heures × {salary_nett}€) : {base_salary:.2f}€")
-    print(f"Avec prime de 10% : {with_bonus:.2f}€")
-    print(f"Indemnité de transport : +{transport:.2f}€")
-    print("\n" + "=" * 42)
-    print(f"SALAIRE TOTAL : {total_salary:.2f}€")
-    print("=" * 42 + "\n")
+    if not json_output:
+        print("\n=== DÉTAIL DU SALAIRE ===")
+        print(f"Salaire de base ({total_hours} heures × {salary_nett}€) : {base_salary:.2f}€")
+        print(f"Avec prime de 10% : {with_bonus:.2f}€")
+        print(f"Indemnité de transport : +{transport:.2f}€")
+        print("\n" + "=" * 42)
+        print(f"SALAIRE TOTAL : {total_salary:.2f}€")
+        print("=" * 42 + "\n")
 
-    return {
+    result = {
         'year': current_year,
         'month': month,
         'days_in_month': days_in_month,
         'total_hours': total_hours,
+        'base_salary': round(base_salary, 2),
+        'salary_with_bonus': round(with_bonus, 2),
+        'transport_allowance': round(transport, 2),
         'total_salary': round(total_salary, 2),
-        'sunday_bonus': sunday_bonus,
-        'holiday_bonus': holiday_bonus,
-        'thursday_bonus': thursday_bonus,
-        'absent_days': nb_absent_days
+        'breakdown': {
+            'sunday_bonus_hours': sunday_bonus,
+            'holiday_bonus_hours': holiday_bonus,
+            'thursday_bonus_hours': thursday_bonus,
+            'absent_days': nb_absent_days,
+            'sundays': sundays,
+            'holidays': holidays,
+            'holidays_not_sunday': holidays_not_sunday,
+            'thursdays': thursdays
+        }
     }
+    
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    
+    return result
 
 
 def main():
@@ -238,6 +273,14 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
         choices=range(1, 13),
         metavar='MOIS',
         help='Mois ciblé (1-12). Par défaut, le mois en cours'
+    )
+
+    parser.add_argument(
+        '--y', '--year',
+        type=int,
+        default=None,
+        metavar='ANNÉE',
+        help='Année ciblée (ex: 2026). Par défaut, l\'année en cours'
     )
 
     parser.add_argument(
@@ -272,6 +315,12 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
         help='Chemin vers le fichier ICS des jours fériés (défaut : jours_feries_metropole.ics)'
     )
 
+    parser.add_argument(
+        '--json',
+        action='store_true',
+        help='Afficher le résultat au format JSON'
+    )
+
     args = parser.parse_args()
 
     # Validation des arguments
@@ -283,6 +332,9 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
 
     if args.t < 0:
         parser.error("L'indemnité de transport ne peut pas être négative")
+    
+    if args.y is not None and (args.y < 1900 or args.y > 2100):
+        parser.error("L'année doit être entre 1900 et 2100")
 
     # Exécution du calcul
     try:
@@ -291,8 +343,13 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
             salary_nett=args.sn,
             nb_absent_days=args.nb_a_d,
             transport=args.t,
-            ics_file=args.ics
+            ics_file=args.ics,
+            year=args.y,
+            json_output=args.json
         )
+    except ValueError as e:
+        print(f"Erreur de validation : {e}", file=sys.stderr)
+        sys.exit(1)
     except Exception as e:
         print(f"Erreur : {e}", file=sys.stderr)
         sys.exit(1)
