@@ -59,7 +59,7 @@ Le script prend en compte :
 python3 cesu.py
 
 # Calculer pour un mois spécifique avec des valeurs personnalisées
-python3 cesu.py --m 6 --sn 15 --t 80 --nb-a-d 2
+python3 cesu.py -m 6 -s 15 -t 80 -n 2
 
 # Afficher l'aide
 python3 cesu.py --help
@@ -101,11 +101,13 @@ python3 cesu.py
 
 | Option | Forme longue | Défaut | Description |
 |:-------|:-------------|:------:|:------------|
-| `--m` | `--month` | Mois actuel | Mois cible (1-12) |
-| `--sn` | `--salary-nett` | `12.0` | Salaire horaire net en euros |
-| `--nb-a-d` | `--nb-absent-days` | `0` | Nombre de jours d'absence |
-| `--t` | `--transport` | `60.0` | Indemnité de transport mensuelle en euros |
-| `--ics` | | `jours_feries_metropole.ics` | Chemin vers le fichier ICS des jours fériés |
+| `-m` | `--month` | Mois actuel | Mois cible (1-12) |
+| `-y` | `--year` | Année actuelle | Année cible (ex: 2026) |
+| `-s` | `--salary-nett` | `12.0` | Salaire horaire net en euros |
+| `-n` | `--nb-absent-days` | `0` | Nombre de jours d'absence |
+| `-t` | `--transport` | `60.0` | Indemnité de transport mensuelle en euros |
+| `--ics` | | répertoire du script | Chemin vers le fichier ICS des jours fériés |
+| `-j` | `--json` | | Afficher le résultat au format JSON |
 
 #### Exemples
 
@@ -114,16 +116,16 @@ python3 cesu.py
 python3 cesu.py
 
 # Calculer pour le mois de mars
-python3 cesu.py --m 3
+python3 cesu.py -m 3
 
 # Calculer avec un salaire et transport personnalisés
-python3 cesu.py --sn 15 --t 80
+python3 cesu.py -s 15 -t 80
 
 # Calculer pour juin avec 2 jours d'absence
-python3 cesu.py --m 6 --nb-a-d 2
+python3 cesu.py -m 6 -n 2
 
 # Calcul entièrement personnalisé
-python3 cesu.py --m 12 --sn 14.50 --t 75 --nb-a-d 1
+python3 cesu.py -m 12 -s 14.50 -t 75 -n 1
 
 # Afficher l'aide
 python3 cesu.py --help
@@ -175,35 +177,32 @@ SALAIRE_TOTAL = ((HEURES_TOTALES × SALAIRE_NET) × 1.10) + TRANSPORT
 
 ## Exemple de sortie
 
-**Entrée** : Mois 6 (juin 2026) avec 30 jours, 4 dimanches, 5 jeudis, 1 jour férié, 0 jour d'absence
+**Entrée** : Mois 6 (juin 2026) avec 30 jours, 4 dimanches, 4 jeudis, 0 jour férié, 0 jour d'absence
 
 ```
-$ python3 cesu.py --m 6
+$ python3 cesu.py -m 6
 
-=== SALARY CALCULATION FOR 6/2026 ===
-Days in month: 30
-ICS file 'jours_feries_metropole.ics' not found locally.
-Downloading holidays data from https://etalab.github.io/jours-feries-france-data/...
-Successfully downloaded to jours_feries_metropole.ics
-Public holidays in month 6/2026: [8]
-Sundays: [7, 14, 21, 28] (count: 4)
-Thursdays: [4, 11, 18, 25] (count: 4)
+=== CALCUL DE SALAIRE POUR 6/2026 ===
+Nombre de jours dans le mois : 30
+Jours fériés du mois 6/2026 : []
+Dimanches : [7, 14, 21, 28] (total : 4)
+Jeudis : [4, 11, 18, 25] (total : 4)
 
-=== HOURS BREAKDOWN ===
-Base hours (1 per day): 30
-Sunday bonus (+1 per Sunday): +4
-Holiday bonus (+1 per holiday): +1
-Thursday bonus (25% per Thursday): +1
-Absent days: -0
-TOTAL HOURS: 36.0
+=== DÉTAIL DES HEURES ===
+Heures de base (1 par jour) : 30
+Majoration dimanches (+1 par dimanche) : +4
+Majoration jours fériés (+1 par jour férié non-dimanche) : +0
+Majoration jeudis (25% par jeudi, arrondi supérieur) : +1
+Jours d'absence : -0
+TOTAL DES HEURES : 35.0
 
-=== SALARY BREAKDOWN ===
-Base salary (36.0 hours × 12.0€): 432.00€
-With 10% bonus: 475.20€
-Transport allowance: +60.00€
+=== DÉTAIL DU SALAIRE ===
+Salaire de base (35.0 heures × 12.0€) : 420.00€
+Avec prime de 10% : 462.00€
+Indemnité de transport : +60.00€
 
 ==========================================
-TOTAL SALARY: 535.20€
+SALAIRE TOTAL : 522.00€
 ==========================================
 ```
 

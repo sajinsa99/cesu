@@ -22,6 +22,7 @@ import sys
 from datetime import datetime
 from math import ceil
 from pathlib import Path
+from urllib.parse import urlparse
 from urllib.request import urlopen
 from urllib.error import URLError
 import json
@@ -41,6 +42,10 @@ def download_ics_file(url, destination):
     Returns:
         bool: True si réussi, False sinon
     """
+    parsed = urlparse(url)
+    if parsed.scheme != 'https':
+        print(f"Avertissement : URL refusée (HTTPS requis) : {url}", file=sys.stderr)
+        return False
     try:
         print(f"Téléchargement des données de jours fériés depuis {url}...")
         with urlopen(url, timeout=30) as response:
@@ -102,9 +107,6 @@ def parse_ics_holidays(ics_file, year, month):
 
         return sorted(holidays)
 
-    except FileNotFoundError:
-        print(f"Avertissement : Fichier ICS '{ics_file}' introuvable. Poursuite du calcul sans les jours fériés.", file=sys.stderr)
-        return []
     except Exception as e:
         print(f"Avertissement : Impossible d'analyser le fichier ICS : {e}", file=sys.stderr)
         return []
@@ -259,15 +261,15 @@ def main():
         epilog="""
 Exemples :
   %(prog)s                                    # Calcul pour le mois en cours avec les valeurs par défaut
-  %(prog)s --m 3 --sn 15 --t 80              # Calcul pour mars avec des valeurs personnalisées
-  %(prog)s --m 6 --nb-a-d 2                  # Calcul pour juin avec 2 jours d'absence
+  %(prog)s -m 3 -s 15 -t 80                  # Calcul pour mars avec des valeurs personnalisées
+  %(prog)s -m 6 -n 2                          # Calcul pour juin avec 2 jours d'absence
 
 Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculator
         """
     )
 
     parser.add_argument(
-        '--m', '--month',
+        '-m', '--month',
         type=int,
         default=datetime.now().month,
         choices=range(1, 13),
@@ -276,7 +278,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     )
 
     parser.add_argument(
-        '--y', '--year',
+        '-y', '--year',
         type=int,
         default=None,
         metavar='ANNÉE',
@@ -284,7 +286,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     )
 
     parser.add_argument(
-        '--sn', '--salary-nett',
+        '-s', '--salary-nett',
         type=float,
         default=12.0,
         metavar='MONTANT',
@@ -292,7 +294,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     )
 
     parser.add_argument(
-        '--nb-a-d', '--nb-absent-days',
+        '-n', '--nb-absent-days',
         type=int,
         default=0,
         metavar='JOURS',
@@ -300,7 +302,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     )
 
     parser.add_argument(
-        '--t', '--transport',
+        '-t', '--transport',
         type=float,
         default=60.0,
         metavar='MONTANT',
@@ -310,13 +312,13 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '--ics',
         type=str,
-        default='jours_feries_metropole.ics',
+        default=str(Path(__file__).parent / 'jours_feries_metropole.ics'),
         metavar='FICHIER',
-        help='Chemin vers le fichier ICS des jours fériés (défaut : jours_feries_metropole.ics)'
+        help='Chemin vers le fichier ICS des jours fériés (défaut : répertoire du script)'
     )
 
     parser.add_argument(
-        '--json',
+        '-j', '--json',
         action='store_true',
         help='Afficher le résultat au format JSON'
     )
@@ -324,27 +326,27 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     args = parser.parse_args()
 
     # Validation des arguments
-    if args.sn <= 0:
+    if args.salary_nett <= 0:
         parser.error("Le salaire doit être supérieur à 0")
 
-    if args.nb_a_d < 0:
+    if args.nb_absent_days < 0:
         parser.error("Le nombre de jours d'absence ne peut pas être négatif")
 
-    if args.t < 0:
+    if args.transport < 0:
         parser.error("L'indemnité de transport ne peut pas être négative")
     
-    if args.y is not None and (args.y < 1900 or args.y > 2100):
+    if args.year is not None and (args.year < 1900 or args.year > 2100):
         parser.error("L'année doit être entre 1900 et 2100")
 
     # Exécution du calcul
     try:
         calculate_salary(
-            month=args.m,
-            salary_nett=args.sn,
-            nb_absent_days=args.nb_a_d,
-            transport=args.t,
+            month=args.month,
+            salary_nett=args.salary_nett,
+            nb_absent_days=args.nb_absent_days,
+            transport=args.transport,
             ics_file=args.ics,
-            year=args.y,
+            year=args.year,
             json_output=args.json
         )
     except ValueError as e:
