@@ -1,0 +1,24 @@
+
+=== CALCUL DE SALAIRE POUR 3/2026 ===
+Nombre de jours dans le mois : 31
+Jours fériés du mois 3/2026 : 0
+Dimanches : [1, 8, 15, 22, 29] (total : 5)
+Jeudis : [5, 12, 19, 26] (total : 4)
+
+=== DÉTAIL DES HEURES ===
+Heures de base (1 par jour) : 31
+Majoration dimanches (+1 par dimanche) : +5
+Majoration jours fériés (+1 par jour férié non-dimanche) : 0
+Majoration jeudis (25% par jeudi, arrondi supérieur) : +1
+Jours d'absence : -2
+TOTAL DES HEURES : 35.0
+
+=== DÉTAIL DU SALAIRE ===
+Salaire de base (35.0 heures × 12.0€) : 420.00€
+Avec prime de 10% : 462.00€
+Indemnité de transport : +60.00€
+
+==========================================
+SALAIRE TOTAL : 522.00€
+==========================================
+

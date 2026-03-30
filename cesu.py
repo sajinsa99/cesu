@@ -154,28 +154,28 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
 
     # Récupération du nombre de jours dans le mois
     days_in_month = calendar.monthrange(current_year, month)[1]
-    
+
     # Validation du nombre de jours d'absence
     if nb_absent_days > days_in_month:
         raise ValueError(f"Le nombre de jours d'absence ({nb_absent_days}) ne peut pas dépasser le nombre de jours dans le mois ({days_in_month})")
-    
+
     if not json_output:
         print(f"\n=== CALCUL DE SALAIRE POUR {month}/{current_year} ===")
         print(f"Nombre de jours dans le mois : {days_in_month}")
 
     # Chargement des jours fériés depuis le fichier ICS
     holidays = parse_ics_holidays(ics_file, current_year, month)
-    
+
     # Comptage des dimanches (jour 6) et des jeudis (jour 3)
     sundays = get_weekday_occurrences(current_year, month, 6)  # Dimanche
     thursdays = get_weekday_occurrences(current_year, month, 3)  # Jeudi
-    
+
     # Filtrer les jours fériés qui tombent un dimanche pour éviter le double comptage
     # Un jour férié tombant un dimanche bénéficie déjà de la majoration dimanche
     holidays_not_sunday = [h for h in holidays if h not in sundays]
-    
+
     if not json_output:
-        print(f"Jours fériés du mois {month}/{current_year} : {holidays}")
+        print(f"Jours fériés du mois {month}/{current_year} : {holidays if holidays else 0}")
         if len(holidays) != len(holidays_not_sunday):
             print(f"  → Jours fériés tombant un dimanche (déjà majorés) : {[h for h in holidays if h in sundays]}")
             print(f"  → Jours fériés à majorer : {holidays_not_sunday}")
@@ -206,9 +206,9 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
         print("\n=== DÉTAIL DES HEURES ===")
         print(f"Heures de base (1 par jour) : {days_in_month}")
         print(f"Majoration dimanches (+1 par dimanche) : +{sunday_bonus}")
-        print(f"Majoration jours fériés (+1 par jour férié non-dimanche) : +{holiday_bonus}")
+        print(f"Majoration jours fériés (+1 par jour férié non-dimanche) : {f'+{holiday_bonus}' if holiday_bonus > 0 else 0}")
         print(f"Majoration jeudis (25% par jeudi, arrondi supérieur) : +{thursday_bonus}")
-        print(f"Jours d'absence : -{nb_absent_days}")
+        print(f"Jours d'absence : {f'-{nb_absent_days}' if nb_absent_days > 0 else 0}")
         print(f"TOTAL DES HEURES : {total_hours}")
 
     # Calcul du salaire
@@ -246,15 +246,17 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
             'thursdays': thursdays
         }
     }
-    
+
     if json_output:
         print(json.dumps(result, indent=2, ensure_ascii=False))
-    
+
     return result
 
 
 def main():
     """Point d'entrée principal du calculateur de salaire CESU."""
+    _UNSET = object()
+
     parser = argparse.ArgumentParser(
         description='Calculateur de Salaire CESU - Calcul du salaire mensuel conforme au droit du travail français',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -271,8 +273,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '-m', '--month',
         type=int,
-        default=datetime.now().month,
-        choices=range(1, 13),
+        default=_UNSET,
         metavar='MOIS',
         help='Mois ciblé (1-12). Par défaut, le mois en cours'
     )
@@ -280,7 +281,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '-y', '--year',
         type=int,
-        default=None,
+        default=_UNSET,
         metavar='ANNÉE',
         help='Année ciblée (ex: 2026). Par défaut, l\'année en cours'
     )
@@ -288,7 +289,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '-s', '--salary-nett',
         type=float,
-        default=12.0,
+        default=_UNSET,
         metavar='MONTANT',
         help='Salaire horaire net en euros (défaut : 12)'
     )
@@ -296,7 +297,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '-n', '--nb-absent-days',
         type=int,
-        default=0,
+        default=_UNSET,
         metavar='JOURS',
         help='Nombre de jours d\'absence à déduire (défaut : 0)'
     )
@@ -304,7 +305,7 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     parser.add_argument(
         '-t', '--transport',
         type=float,
-        default=60.0,
+        default=_UNSET,
         metavar='MONTANT',
         help='Indemnité de transport mensuelle en euros (défaut : 60)'
     )
@@ -323,7 +324,57 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
         help='Afficher le résultat au format JSON'
     )
 
+    parser.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help='Mode silencieux : pas de prompt, utilise les valeurs par défaut'
+    )
+
     args = parser.parse_args()
+
+    # Prompt interactif pour les paramètres non fournis en ligne de commande
+    # (uniquement si stdin est un terminal, pour ne pas bloquer les pipelines)
+    if sys.stdin.isatty() and not args.json and not args.quiet:
+        current_year = datetime.now().year
+
+        def prompt(label, default, cast, validator=None):
+            try:
+                raw = input(f"{label} [{default}] : ").strip()
+                value = cast(raw) if raw else default
+                if validator:
+                    validator(value)
+                return value
+            except (ValueError, EOFError):
+                return default
+
+        if args.month is _UNSET:
+            args.month = prompt('Mois (1-12)', datetime.now().month, int,
+                                lambda v: (_ for _ in ()).throw(ValueError()) if not (1 <= v <= 12) else None)
+        if args.year is _UNSET:
+            entered = prompt(f'Année (ex: {current_year})', current_year, int,
+                             lambda v: (_ for _ in ()).throw(ValueError()) if not (1900 <= v <= 2100) else None)
+            args.year = None if entered == current_year else entered
+        if args.salary_nett is _UNSET:
+            args.salary_nett = prompt('Salaire horaire net (€)', 12.0, float,
+                                      lambda v: (_ for _ in ()).throw(ValueError()) if v <= 0 else None)
+        if args.nb_absent_days is _UNSET:
+            args.nb_absent_days = prompt("Jours d'absence", 0, int,
+                                         lambda v: (_ for _ in ()).throw(ValueError()) if v < 0 else None)
+        if args.transport is _UNSET:
+            args.transport = prompt('Indemnité de transport (€)', 60.0, float,
+                                    lambda v: (_ for _ in ()).throw(ValueError()) if v < 0 else None)
+
+    # Appliquer les valeurs par défaut pour les paramètres non fournis et non promptés
+    if args.month is _UNSET:
+        args.month = datetime.now().month
+    if args.year is _UNSET:
+        args.year = None
+    if args.salary_nett is _UNSET:
+        args.salary_nett = 12.0
+    if args.nb_absent_days is _UNSET:
+        args.nb_absent_days = 0
+    if args.transport is _UNSET:
+        args.transport = 60.0
 
     # Validation des arguments
     if args.salary_nett <= 0:
@@ -334,21 +385,40 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
 
     if args.transport < 0:
         parser.error("L'indemnité de transport ne peut pas être négative")
-    
+
     if args.year is not None and (args.year < 1900 or args.year > 2100):
         parser.error("L'année doit être entre 1900 et 2100")
 
     # Exécution du calcul
+    resolved_year = args.year if args.year is not None else datetime.now().year
+    output_filename = f"{resolved_year}_{args.month:02d}.txt"
+
+    class Tee:
+        def __init__(self, *files):
+            self.files = files
+        def write(self, obj):
+            for f in self.files:
+                f.write(obj)
+        def flush(self):
+            for f in self.files:
+                f.flush()
+
     try:
-        calculate_salary(
-            month=args.month,
-            salary_nett=args.salary_nett,
-            nb_absent_days=args.nb_absent_days,
-            transport=args.transport,
-            ics_file=args.ics,
-            year=args.year,
-            json_output=args.json
-        )
+        with open(output_filename, 'w', encoding='utf-8') as out_file:
+            sys.stdout = Tee(sys.__stdout__, out_file)
+            try:
+                calculate_salary(
+                    month=args.month,
+                    salary_nett=args.salary_nett,
+                    nb_absent_days=args.nb_absent_days,
+                    transport=args.transport,
+                    ics_file=args.ics,
+                    year=args.year,
+                    json_output=args.json
+                )
+            finally:
+                sys.stdout = sys.__stdout__
+        print(f"Résultat sauvegardé dans {output_filename}")
     except ValueError as e:
         print(f"Erreur de validation : {e}", file=sys.stderr)
         sys.exit(1)
