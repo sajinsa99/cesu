@@ -48,6 +48,9 @@ Le script prend en compte :
 | **Calcul des primes** | Applique les coefficients légaux pour les jours spéciaux |
 | **Gestion des absences** | Déduit les jours d'absence du total d'heures |
 | **Téléchargement automatique** | Le script Python télécharge automatiquement les données de jours fériés si absentes |
+| **Mode interactif** | Invite à saisir les paramètres manquants avec la valeur par défaut pré-remplie |
+| **Mode silencieux** | Option `-q` pour utiliser les valeurs par défaut sans prompt |
+| **Sortie fichier** | Résultat automatiquement sauvegardé dans `AAAA_MM.txt` |
 | **Aucune dépendance externe** | La version Python utilise uniquement la bibliothèque standard |
 
 ---
@@ -108,11 +111,12 @@ python3 cesu.py
 | `-t` | `--transport` | `60.0` | Indemnité de transport mensuelle en euros |
 | `--ics` | | répertoire du script | Chemin vers le fichier ICS des jours fériés |
 | `-j` | `--json` | | Afficher le résultat au format JSON |
+| `-q` | `--quiet` | | Mode silencieux : pas de prompt, utilise les valeurs par défaut |
 
 #### Exemples
 
 ```bash
-# Calculer pour le mois en cours avec toutes les valeurs par défaut
+# Calculer pour le mois en cours avec toutes les valeurs par défaut (mode interactif)
 python3 cesu.py
 
 # Calculer pour le mois de mars
@@ -126,6 +130,12 @@ python3 cesu.py -m 6 -n 2
 
 # Calcul entièrement personnalisé
 python3 cesu.py -m 12 -s 14.50 -t 75 -n 1
+
+# Mode silencieux (pas de prompt, valeurs par défaut)
+python3 cesu.py -q
+
+# Afficher le résultat au format JSON
+python3 cesu.py -j
 
 # Afficher l'aide
 python3 cesu.py --help
@@ -180,20 +190,20 @@ SALAIRE_TOTAL = ((HEURES_TOTALES × SALAIRE_NET) × 1.10) + TRANSPORT
 **Entrée** : Mois 6 (juin 2026) avec 30 jours, 4 dimanches, 4 jeudis, 0 jour férié, 0 jour d'absence
 
 ```
-$ python3 cesu.py -m 6
+$ python3 cesu.py -m 6 -q
 
 === CALCUL DE SALAIRE POUR 6/2026 ===
 Nombre de jours dans le mois : 30
-Jours fériés du mois 6/2026 : []
+Jours fériés du mois 6/2026 : 0
 Dimanches : [7, 14, 21, 28] (total : 4)
 Jeudis : [4, 11, 18, 25] (total : 4)
 
 === DÉTAIL DES HEURES ===
 Heures de base (1 par jour) : 30
 Majoration dimanches (+1 par dimanche) : +4
-Majoration jours fériés (+1 par jour férié non-dimanche) : +0
+Majoration jours fériés (+1 par jour férié non-dimanche) : 0
 Majoration jeudis (25% par jeudi, arrondi supérieur) : +1
-Jours d'absence : -0
+Jours d'absence : 0
 TOTAL DES HEURES : 35.0
 
 === DÉTAIL DU SALAIRE ===
@@ -204,6 +214,8 @@ Indemnité de transport : +60.00€
 ==========================================
 SALAIRE TOTAL : 522.00€
 ==========================================
+
+Résultat sauvegardé dans 2026_06.txt
 ```
 
 ---
@@ -225,6 +237,7 @@ SALAIRE TOTAL : 522.00€
 |:--------|:------------|
 | `cesu.py` | Script Python pour le calcul du salaire |
 | `jours_feries_metropole.ics` | Jours fériés français (format ICS, téléchargé automatiquement) |
+| `AAAA_MM.txt` | Résultat du calcul (ex: `2026_06.txt`), généré automatiquement |
 | `README.md` | Cette documentation |
 
 ---
