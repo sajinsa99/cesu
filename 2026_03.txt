@@ -1,5 +1,5 @@
 
-=== CALCUL DE SALAIRE POUR 3/2026 ===
+=== CALCUL DE SALAIRE POUR Mars 2026 ===
 Nombre de jours dans le mois : 31
 Jours fériés du mois 3/2026 : 0
 Dimanches : [1, 8, 15, 22, 29] (total : 5)

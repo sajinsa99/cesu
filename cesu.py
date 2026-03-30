@@ -160,7 +160,8 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
         raise ValueError(f"Le nombre de jours d'absence ({nb_absent_days}) ne peut pas dépasser le nombre de jours dans le mois ({days_in_month})")
 
     if not json_output:
-        print(f"\n=== CALCUL DE SALAIRE POUR {month}/{current_year} ===")
+        mois_fr = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
+        print(f"\n=== CALCUL DE SALAIRE POUR {mois_fr[month-1]} {current_year} ===")
         print(f"Nombre de jours dans le mois : {days_in_month}")
 
     # Chargement des jours fériés depuis le fichier ICS
