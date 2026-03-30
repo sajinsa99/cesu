@@ -50,7 +50,7 @@ Le script prend en compte :
 | **Téléchargement automatique** | Le script Python télécharge automatiquement les données de jours fériés si absentes |
 | **Mode interactif** | Invite à saisir les paramètres manquants avec la valeur par défaut pré-remplie |
 | **Mode silencieux** | Option `-q` pour utiliser les valeurs par défaut sans prompt |
-| **Sortie fichier** | Résultat automatiquement sauvegardé dans `AAAA_MM.txt` |
+| **Sortie fichier** | Résultat automatiquement sauvegardé dans `AAAA_MM.md` |
 | **Aucune dépendance externe** | La version Python utilise uniquement la bibliothèque standard |
 
 ---
@@ -215,7 +215,7 @@ Indemnité de transport : +60.00€
 SALAIRE TOTAL : 522.00€
 ==========================================
 
-Résultat sauvegardé dans 2026_06.txt
+Résultat sauvegardé dans 2026_06.md
 ```
 
 ---
@@ -237,7 +237,7 @@ Résultat sauvegardé dans 2026_06.txt
 |:--------|:------------|
 | `cesu.py` | Script Python pour le calcul du salaire |
 | `jours_feries_metropole.ics` | Jours fériés français (format ICS, téléchargé automatiquement) |
-| `AAAA_MM.txt` | Résultat du calcul (ex: `2026_06.txt`), généré automatiquement |
+| `AAAA_MM.md` | Résultat du calcul (ex: `2026_06.md`), généré automatiquement |
 | `README.md` | Cette documentation |
 
 ---

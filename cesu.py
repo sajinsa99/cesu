@@ -254,6 +254,58 @@ def calculate_salary(month, salary_nett, nb_absent_days, transport, ics_file='jo
     return result
 
 
+def write_markdown(result, salary_nett, filename):
+    """Génère un fichier Markdown formaté à partir des résultats du calcul."""
+    mois_fr = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"]
+    month_name = mois_fr[result['month'] - 1]
+    bd = result['breakdown']
+
+    lines = [
+        f"# Calcul de salaire CESU — {month_name} {result['year']}",
+        "",
+        "## Informations générales",
+        "",
+        "| Paramètre | Valeur |",
+        "|-----------|--------|",
+        f"| Mois | {month_name} {result['year']} |",
+        f"| Jours dans le mois | {result['days_in_month']} |",
+        f"| Salaire horaire net | {salary_nett:.2f} € |",
+        f"| Jours d'absence | {bd['absent_days']} |",
+        "",
+        "## Jours particuliers",
+        "",
+        "| Type | Jours | Nombre |",
+        "|------|-------|--------|",
+        f"| Dimanches | {bd['sundays'] or '—'} | {len(bd['sundays'])} |",
+        f"| Jeudis | {bd['thursdays'] or '—'} | {len(bd['thursdays'])} |",
+        f"| Jours fériés | {bd['holidays'] or '—'} | {len(bd['holidays'])} |",
+        f"| Jours fériés (hors dimanche) | {bd['holidays_not_sunday'] or '—'} | {len(bd['holidays_not_sunday'])} |",
+        "",
+        "## Détail des heures",
+        "",
+        "| Composante | Heures |",
+        "|------------|--------|",
+        f"| Heures de base (1 par jour) | {result['days_in_month']} |",
+        f"| Majoration dimanches (+1 par dimanche) | +{bd['sunday_bonus_hours']} |",
+        f"| Majoration jours fériés (+1 par jour férié hors dimanche) | +{bd['holiday_bonus_hours']} |",
+        f"| Majoration jeudis (25%, arrondi supérieur) | +{bd['thursday_bonus_hours']} |",
+        f"| Jours d'absence | -{bd['absent_days']} |",
+        f"| **Total des heures** | **{result['total_hours']}** |",
+        "",
+        "## Détail du salaire",
+        "",
+        "| Composante | Montant |",
+        "|------------|---------|",
+        f"| Salaire de base ({result['total_hours']}h × {salary_nett:.2f} €) | {result['base_salary']:.2f} € |",
+        f"| Avec prime de 10% | {result['salary_with_bonus']:.2f} € |",
+        f"| Indemnité de transport | +{result['transport_allowance']:.2f} € |",
+        f"| **Salaire total** | **{result['total_salary']:.2f} €** |",
+    ]
+
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines) + '\n')
+
+
 def main():
     """Point d'entrée principal du calculateur de salaire CESU."""
     _UNSET = object()
@@ -392,34 +444,21 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
 
     # Exécution du calcul
     resolved_year = args.year if args.year is not None else datetime.now().year
-    output_filename = f"{resolved_year}_{args.month:02d}.txt"
-
-    class Tee:
-        def __init__(self, *files):
-            self.files = files
-        def write(self, obj):
-            for f in self.files:
-                f.write(obj)
-        def flush(self):
-            for f in self.files:
-                f.flush()
+    output_filename = f"{resolved_year}_{args.month:02d}.md"
 
     try:
-        with open(output_filename, 'w', encoding='utf-8') as out_file:
-            sys.stdout = Tee(sys.__stdout__, out_file)
-            try:
-                calculate_salary(
-                    month=args.month,
-                    salary_nett=args.salary_nett,
-                    nb_absent_days=args.nb_absent_days,
-                    transport=args.transport,
-                    ics_file=args.ics,
-                    year=args.year,
-                    json_output=args.json
-                )
-            finally:
-                sys.stdout = sys.__stdout__
-        print(f"Résultat sauvegardé dans {output_filename}")
+        result = calculate_salary(
+            month=args.month,
+            salary_nett=args.salary_nett,
+            nb_absent_days=args.nb_absent_days,
+            transport=args.transport,
+            ics_file=args.ics,
+            year=args.year,
+            json_output=args.json
+        )
+        if not args.json:
+            write_markdown(result, args.salary_nett, output_filename)
+            print(f"Résultat sauvegardé dans {output_filename}")
     except ValueError as e:
         print(f"Erreur de validation : {e}", file=sys.stderr)
         sys.exit(1)
