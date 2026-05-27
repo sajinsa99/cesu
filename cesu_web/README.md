@@ -2,6 +2,8 @@
 
 Interface web pour le calcul automatisé du salaire mensuel CESU (Chèque Emploi Service Universel), conforme aux dispositions du droit du travail français.
 
+**Application disponible à : [https://bfablet92.hd.free.fr/cesu/](https://bfablet92.hd.free.fr/cesu/)**
+
 ## Fonctionnalités
 
 - Calcul du salaire mensuel avec toutes les majorations légales :
