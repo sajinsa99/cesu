@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculateur CESU</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <h2>Historique</h2>
+      <div id="history-list"><p class="empty">Aucun calcul enregistré.</p></div>
+    </aside>
+
+    <main id="content">
+      <h1>Calculateur de Salaire CESU</h1>
+
+      <form id="calc-form">
+        <div class="form-grid">
+          <label>
+            Mois
+            <select id="month" name="month" required></select>
+          </label>
+          <label>
+            Année
+            <input id="year" name="year" type="number" min="1900" max="2100" required />
+          </label>
+          <label>
+            Salaire horaire net (€)
+            <input id="salaryNett" name="salaryNett" type="number" step="0.01" min="0.01" required />
+          </label>
+          <label>
+            Jours d'absence
+            <input id="nbAbsentDays" name="nbAbsentDays" type="number" min="0" value="0" />
+          </label>
+          <label>
+            Indemnité de transport (€)
+            <input id="transport" name="transport" type="number" step="0.01" min="0" value="60" />
+          </label>
+        </div>
+        <button type="submit" id="submit-btn">Calculer</button>
+      </form>
+
+      <div id="error-box" class="hidden"></div>
+      <div id="result-box" class="hidden"></div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
