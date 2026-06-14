@@ -125,7 +125,7 @@ section "Markdown"
 mapfile -t md_files < <(find . -path './.git' -prune -o -name 'checks-report.md' -prune -o -name '*.md' -print)
 if [[ ${#md_files[@]} -gt 0 ]]; then
   step "markdownlint-cli2  Markdown files" \
-    "${DOCKER_RUN[@]}" markdownlint-cli2 "${md_files[@]}"
+    "${DOCKER_RUN[@]}" markdownlint-cli2 --fix "${md_files[@]}"
 else
   skip "markdownlint-cli2  (no *.md files found)"
 fi
@@ -133,7 +133,7 @@ fi
 section "JavaScript"
 if [[ -f eslint.config.js || -f cesu_web/eslint.config.js || -f .eslintrc.json ]]; then
   step "eslint  cesu_web/server.js  cesu_web/public/app.js  cesu_web/lib/cesu.js  cesu_web/lib/holidays.js" \
-    "${DOCKER_RUN[@]}" bash -c 'cd cesu_web && eslint server.js public/app.js lib/cesu.js lib/holidays.js'
+    "${DOCKER_RUN[@]}" bash -c 'cd cesu_web && eslint --fix server.js public/app.js lib/cesu.js lib/holidays.js'
 else
   skip "eslint  (no eslint.config.js found — create one to enable)"
 fi
