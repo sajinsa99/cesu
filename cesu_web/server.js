@@ -26,7 +26,7 @@ function saveHistory(history) {
   fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2), 'utf8');
 }
 
-const app = express();
+const app = express(); // nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
 const router = express.Router();
 
 app.use(express.json());

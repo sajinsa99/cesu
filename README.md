@@ -100,7 +100,7 @@ python3 cesu.py
 
 ## Utilisation
 
-#### Options en ligne de commande
+### Options en ligne de commande
 
 | Option | Forme longue | Défaut | Description |
 |:-------|:-------------|:------:|:------------|
@@ -113,7 +113,7 @@ python3 cesu.py
 | `-j` | `--json` | | Afficher le résultat au format JSON |
 | `-q` | `--quiet` | | Mode silencieux : pas de prompt, utilise les valeurs par défaut |
 
-#### Exemples
+### Exemples
 
 ```bash
 # Calculer pour le mois en cours avec toutes les valeurs par défaut (mode interactif)
@@ -174,7 +174,7 @@ Le total des heures facturables est calculé selon les règles suivantes :
 
 ### Formule de calcul du salaire
 
-```
+```text
 HEURES_BASE = Jours_du_mois
 HEURES_PRIME = Dimanches + Jours_fériés + ceil(Jeudis × 0.25)
 HEURES_TOTALES = HEURES_BASE + HEURES_PRIME - Jours_absence
@@ -190,7 +190,7 @@ SALAIRE_TOTAL = ((HEURES_TOTALES × SALAIRE_NET) × 1.10) + TRANSPORT
 
 **Entrée** : Mois 6 (juin 2026) avec 30 jours, 4 dimanches, 4 jeudis, 0 jour férié, 0 jour d'absence
 
-```
+```text
 $ python3 cesu.py -m 6 -q
 
 === CALCUL DE SALAIRE POUR 6/2026 ===
@@ -261,6 +261,4 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ---
 
-<p align="center">
-  <sub>Développé avec Python</sub>
-</p>
+*Développé avec Python*

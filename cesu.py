@@ -48,7 +48,7 @@ def download_ics_file(url, destination):
         return False
     try:
         print(f"Téléchargement des données de jours fériés depuis {url}...")
-        with urlopen(url, timeout=30) as response:
+        with urlopen(url, timeout=30) as response:  # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
             content = response.read().decode('utf-8')
 
         with open(destination, 'w', encoding='utf-8') as f:

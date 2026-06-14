@@ -71,7 +71,7 @@ Le script effectue automatiquement les opérations suivantes :
 
 L'application est ensuite accessible à :
 
-```
+```text
 https://bfablet92.hd.free.fr/cesu/
 ```
 
@@ -140,7 +140,7 @@ Le panneau latéral gauche liste tous les calculs précédents, triés du plus r
 
 ## Structure du projet
 
-```
+```text
 cesu_web/
 ├── server.js                   Point d'entrée Express
 ├── package.json
