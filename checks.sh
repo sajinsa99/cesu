@@ -122,7 +122,7 @@ step "jsonlint  cesu_web/package.json" \
   "${DOCKER_RUN[@]}" jsonlint cesu_web/package.json
 
 section "Markdown"
-mapfile -t md_files < <(find . -path './.git' -prune -o -name '*.md' -print)
+mapfile -t md_files < <(find . -path './.git' -prune -o -name 'checks-report.md' -prune -o -name '*.md' -print)
 if [[ ${#md_files[@]} -gt 0 ]]; then
   step "markdownlint-cli2  Markdown files" \
     "${DOCKER_RUN[@]}" markdownlint-cli2 "${md_files[@]}"
