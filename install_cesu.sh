@@ -32,7 +32,7 @@ fi
 echo "==> Copying project to $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 rsync -a --exclude='.git' --exclude='node_modules' --exclude='data' --exclude='.env' \
-  "$SCRIPT_DIR/" "$INSTALL_DIR/"
+  "$SCRIPT_DIR/cesu_web/" "$INSTALL_DIR/"
 
 echo "==> Installing npm dependencies..."
 cd "$INSTALL_DIR"
