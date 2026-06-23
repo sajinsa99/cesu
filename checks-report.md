@@ -1,4 +1,4 @@
-# Checks Report — cesu — 2026-06-14 11:55:11
+# Checks Report — cesu — 2026-06-23 14:34:11
 
 ## Summary
 
@@ -8,12 +8,12 @@
 | jsonlint  cesu_web/package.json | ✅ PASS |
 | markdownlint-cli2  Markdown files | ❌ FAIL |
 | eslint  (no eslint.config.js found — create one to enable) | ⏭ SKIP |
-| yamllint  (no *.yaml / *.yml files found) | ⏭ SKIP |
-| semgrep  cesu.py + cesu_web JS sources | ❌ FAIL |
+| yamllint  YAML files | ✅ PASS |
+| semgrep  cesu.py + cesu_web JS sources | ✅ PASS |
 | trivy  HIGH/CRITICAL CVEs | ✅ PASS |
 | gitleaks  secrets in repo | ✅ PASS |
 | detect-secrets  (run: detect-secrets scan > .secrets.baseline  to create baseline) | ⏭ SKIP |
-| **Total** | PASS: 4 · FAIL: 2 · SKIP: 3 |
+| **Total** | PASS: 6 · FAIL: 1 · SKIP: 2 |
 
 ---
 
@@ -43,10 +43,11 @@ _no output_
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "helmet": "^8.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "license": "MIT"
 }
@@ -64,36 +65,9 @@ _no output_
 markdownlint-cli2 v0.17.2 (markdownlint v0.37.4)
 Finding: ./README.md ./2026_02.md ./2026_03.md ./cesu_web/README.md ./2026_04.md ./2026_05.md
 Linting: 6 file(s)
-Summary: 29 error(s)
-cesu_web/README.md:3:81 MD013/line-length Line length [Expected: 80; Actual: 154]
-cesu_web/README.md:16:81 MD013/line-length Line length [Expected: 80; Actual: 147]
-cesu_web/README.md:74 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
-cesu_web/README.md:80:81 MD013/line-length Line length [Expected: 80; Actual: 154]
-cesu_web/README.md:133:81 MD013/line-length Line length [Expected: 80; Actual: 181]
-cesu_web/README.md:137:81 MD013/line-length Line length [Expected: 80; Actual: 245]
-cesu_web/README.md:143 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
-cesu_web/README.md:182:81 MD013/line-length Line length [Expected: 80; Actual: 340]
-README.md:3:81 MD013/line-length Line length [Expected: 80; Actual: 133]
-README.md:29:81 MD013/line-length Line length [Expected: 80; Actual: 126]
-README.md:46:81 MD013/line-length Line length [Expected: 80; Actual: 86]
-README.md:47:81 MD013/line-length Line length [Expected: 80; Actual: 103]
-README.md:48:81 MD013/line-length Line length [Expected: 80; Actual: 84]
-README.md:50:81 MD013/line-length Line length [Expected: 80; Actual: 120]
-README.md:51:81 MD013/line-length Line length [Expected: 80; Actual: 104]
-README.md:52:81 MD013/line-length Line length [Expected: 80; Actual: 86]
-README.md:54:81 MD013/line-length Line length [Expected: 80; Actual: 97]
-README.md:103 MD001/heading-increment Heading levels should only increment by one level at a time [Expected: h3; Actual: h4]
-README.md:112:81 MD013/line-length Line length [Expected: 80; Actual: 82]
-README.md:114:81 MD013/line-length Line length [Expected: 80; Actual: 88]
+Summary: 2 error(s)
 README.md:152 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
-README.md:177 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
-README.md:185:81 MD013/line-length Line length [Expected: 80; Actual: 94]
-README.md:191:81 MD013/line-length Line length [Expected: 80; Actual: 100]
-README.md:193 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
-README.md:240:81 MD013/line-length Line length [Expected: 80; Actual: 97]
-README.md:260:81 MD013/line-length Line length [Expected: 80; Actual: 89]
-README.md:264:1 MD033/no-inline-html Inline HTML [Element: p]
-README.md:265:3 MD033/no-inline-html Inline HTML [Element: sub]
+README.md:264 MD036/no-emphasis-as-heading Emphasis used instead of a heading [Context: "Développé avec Python"]
 ```
 
 ---
@@ -108,9 +82,11 @@ README.md:265:3 MD033/no-inline-html Inline HTML [Element: sub]
 
 ## YAML
 
-### `yamllint  (no *.yaml / *.yml files found)`
+### `yamllint  YAML files`
 
-**Status:** ⏭ SKIP
+**Status:** ✅ PASS
+
+_no output_
 
 ---
 
@@ -118,7 +94,7 @@ README.md:265:3 MD033/no-inline-html Inline HTML [Element: sub]
 
 ### `semgrep  cesu.py + cesu_web JS sources`
 
-**Status:** ❌ FAIL (exit 1)
+**Status:** ✅ PASS
 
 ```
                
@@ -140,37 +116,18 @@ README.md:265:3 MD033/no-inline-html Inline HTML [Element: sub]
 │ Scan Summary │
 └──────────────┘
 ✅ Scan completed successfully.
- • Findings: 2 (2 blocking)
+ • Findings: 0 (0 blocking)
  • Rules run: 442
  • Targets scanned: 5
  • Parsed lines: ~100.0%
  • No ignore information available
-Ran 442 rules on 5 files: 2 findings.
-                   
-                   
-┌─────────────────┐
-│ 2 Code Findings │
-└─────────────────┘
-           
-    cesu.py
-    ❯❱ python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
-          ❰❰ Blocking ❱❱
-          Detected a dynamic value being used with urllib. urllib supports 'file://' schemes, so a dynamic    
-          value controlled by a malicious actor may allow them to read arbitrary files. Audit uses of urllib  
-          calls to ensure user data cannot control the URLs, or consider using the 'requests' library instead.
-          Details: https://sg.run/dKZZ                                                                        
-                                                                                                              
-           51┆ with urlopen(url, timeout=30) as response:
-                      
-    cesu_web/server.js
-     ❱ javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
-          ❰❰ Blocking ❱❱
-          A CSRF middleware was not detected in your express application. Ensure you are either using one such
-          as `csurf` or `csrf` (see rule references) and/or you are properly doing CSRF validation in your    
-          routes with a token or cookies.                                                                     
-          Details: https://sg.run/BxzR                                                                        
-                                                                                                              
-           29┆ const app = express();
+Ran 442 rules on 5 files: 0 findings.
+(need more rules? `semgrep login` for additional free Semgrep Registry rules)
+
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/
 ```
 
 ---
@@ -182,21 +139,22 @@ Ran 442 rules on 5 files: 2 findings.
 **Status:** ✅ PASS
 
 ```
-2026-06-14T09:55:05Z	INFO	[vulndb] Need to update DB
-2026-06-14T09:55:05Z	INFO	[vulndb] Downloading vulnerability DB...
-2026-06-14T09:55:05Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
-39.31 MiB / 96.06 MiB [------------------------>____________________________________] 40.92% ? p/s ?59.59 MiB / 96.06 MiB [------------------------------------->_______________________] 62.03% ? p/s ?87.26 MiB / 96.06 MiB [------------------------------------------------------->_____] 90.84% ? p/s ?96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 94.51 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 94.51 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 94.51 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 88.41 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 88.41 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 88.41 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 82.71 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 82.71 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 82.71 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 77.37 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 77.37 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 77.37 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 72.38 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 72.38 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [---------------------------------------------->] 100.00% 72.38 MiB p/s ETA 0s96.06 MiB / 96.06 MiB [-------------------------------------------------] 100.00% 26.68 MiB p/s 3.8s2026-06-14T09:55:10Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
-2026-06-14T09:55:10Z	INFO	[vuln] Vulnerability scanning is enabled
-2026-06-14T09:55:10Z	INFO	Number of language-specific files	num=0
-2026-06-14T09:55:10Z	WARN	[report] Supported files for scanner(s) not found.	scanners=[vuln]
+2026-06-23T12:34:05Z	INFO	[vulndb] Need to update DB
+2026-06-23T12:34:05Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-06-23T12:34:05Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
+27.63 MiB / 96.98 MiB [----------------->___________________________________________] 28.49% ? p/s ?69.73 MiB / 96.98 MiB [------------------------------------------->_________________] 71.91% ? p/s ?96.98 MiB / 96.98 MiB [----------------------------------------------------------->] 100.00% ? p/s ?96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 115.40 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 115.40 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 115.40 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 107.96 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 107.96 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 107.96 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 100.99 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 100.99 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [--------------------------------------------->] 100.00% 100.99 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 94.48 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 94.48 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 94.48 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 88.38 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 88.38 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [---------------------------------------------->] 100.00% 88.38 MiB p/s ETA 0s96.98 MiB / 96.98 MiB [-------------------------------------------------] 100.00% 27.53 MiB p/s 3.7s2026-06-23T12:34:09Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-06-23T12:34:09Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-06-23T12:34:09Z	INFO	[npm] To collect the license information of packages, "npm install" needs to be performed beforehand	dir="cesu_web/node_modules"
+2026-06-23T12:34:09Z	INFO	Number of language-specific files	num=1
+2026-06-23T12:34:09Z	INFO	[npm] Detecting vulnerabilities...
 
 Report Summary
 
-┌────────┬──────┬─────────────────┐
-│ Target │ Type │ Vulnerabilities │
-├────────┼──────┼─────────────────┤
-│   -    │  -   │        -        │
-└────────┴──────┴─────────────────┘
+┌────────────────────────────┬──────┬─────────────────┐
+│           Target           │ Type │ Vulnerabilities │
+├────────────────────────────┼──────┼─────────────────┤
+│ cesu_web/package-lock.json │ npm  │        0        │
+└────────────────────────────┴──────┴─────────────────┘
 Legend:
 - '-': Not scanned
 - '0': Clean (no security findings detected)
@@ -218,9 +176,9 @@ Legend:
     ○ ░
     ░    gitleaks
 
-[90m9:55AM[0m [32mINF[0m [1m21 commits scanned.[0m
-[90m9:55AM[0m [32mINF[0m [1mscanned ~116303 bytes (116.30 KB) in 235ms[0m
-[90m9:55AM[0m [32mINF[0m [1mno leaks found[0m
+[90m12:34PM[0m [32mINF[0m [1m25 commits scanned.[0m
+[90m12:34PM[0m [32mINF[0m [1mscanned ~163588 bytes (163.59 KB) in 242ms[0m
+[90m12:34PM[0m [32mINF[0m [1mno leaks found[0m
 ```
 
 ---
