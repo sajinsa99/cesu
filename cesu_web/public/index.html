@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="base-path" content="/cesu" />
   <title>Calculateur CESU</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -17,6 +18,9 @@
       <h1>Calculateur de Salaire CESU</h1>
 
       <form id="calc-form">
+        <div id="readonly-banner" class="hidden readonly-banner">
+          Consultation seule — ce mois est clôturé et ne peut plus être modifié.
+        </div>
         <div class="form-grid">
           <label>
             Mois
@@ -47,6 +51,21 @@
     </main>
   </div>
 
+  <!-- Toast notification -->
+  <div id="toast" class="hidden" role="status" aria-live="polite">Enregistré ✓</div>
+
+  <!-- Confirm dialog -->
+  <div id="confirm-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-msg">
+    <div id="confirm-box">
+      <p id="confirm-msg">Supprimer ce calcul ?</p>
+      <div class="confirm-actions">
+        <button id="confirm-cancel">Annuler</button>
+        <button id="confirm-ok" class="btn-danger">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="constants.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

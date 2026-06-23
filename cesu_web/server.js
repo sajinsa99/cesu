@@ -1,9 +1,11 @@
 'use strict';
 
 const express = require('express');
+const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
-const { calculateSalary } = require('./lib/cesu');
+const { calculateSalary, daysInMonth } = require('./lib/cesu');
+const { entryKey } = require('./lib/constants');
 
 const PORT = process.env.PORT || 4000;
 const BASE_PATH = process.env.BASE_PATH || '/cesu';
@@ -27,14 +29,25 @@ function saveHistory(history) {
 }
 
 const app = express(); // nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
+app.set('trust proxy', 'loopback');
+app.use(helmet({ contentSecurityPolicy: false }));
+
 const router = express.Router();
 
-app.use(express.json());
+app.use(express.json({ limit: '4kb' }));
 app.use(BASE_PATH, router);
 
 router.use(express.static(path.join(__dirname, 'public')));
 
+router.get('/healthz', (_req, res) => {
+  res.json({ ok: true, uptime: process.uptime() });
+});
+
 router.post('/api/calculate', async (req, res) => {
+  if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+    return res.status(400).json({ error: 'Corps de requête invalide' });
+  }
+
   const { month, year, salaryNett, nbAbsentDays, transport } = req.body;
 
   const m = parseInt(month, 10);
@@ -49,6 +62,14 @@ router.post('/api/calculate', async (req, res) => {
   if (a < 0) return res.status(400).json({ error: "Jours d'absence négatifs" });
   if (t < 0) return res.status(400).json({ error: 'Transport négatif' });
 
+  const dim = daysInMonth(y, m);
+  if (a > dim) return res.status(400).json({ error: `Les jours d'absence (${a}) dépassent le nombre de jours du mois (${dim})` });
+
+  const now = new Date();
+  const currentKey = entryKey(now.getFullYear(), now.getMonth() + 1);
+  const requestedKey = entryKey(y, m);
+  if (requestedKey < currentKey) return res.status(403).json({ error: 'Impossible de modifier un mois passé.' });
+
   try {
     const result = await calculateSalary({
       month: m, year: y, salaryNett: s,
@@ -56,7 +77,7 @@ router.post('/api/calculate', async (req, res) => {
     });
 
     const history = loadHistory();
-    const key = `${y}-${String(m).padStart(2, '0')}`;
+    const key = entryKey(y, m);
     const idx = history.findIndex(e => e.key === key);
     const entry = { key, ...result, salaryNett: s, savedAt: new Date().toISOString() };
     if (idx >= 0) history[idx] = entry;
@@ -74,7 +95,20 @@ router.get('/api/history', (req, res) => {
 });
 
 router.delete('/api/history/:key', (req, res) => {
-  const history = loadHistory().filter(e => e.key !== req.params.key);
+  const { key } = req.params;
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(key)) {
+    return res.status(400).json({ error: 'Format de clé invalide (YYYY-MM)' });
+  }
+
+  const now = new Date();
+  const currentKey = entryKey(now.getFullYear(), now.getMonth() + 1);
+  if (key < currentKey) return res.status(403).json({ error: 'Impossible de supprimer un mois passé.' });
+
+  const history = loadHistory();
+  const idx = history.findIndex(e => e.key === key);
+  if (idx < 0) return res.status(404).json({ error: 'Entrée introuvable.' });
+
+  history.splice(idx, 1);
   saveHistory(history);
   res.json({ ok: true });
 });

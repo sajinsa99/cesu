@@ -14,8 +14,8 @@ fi
 
 echo "==> Checking Node.js..."
 if ! command -v node &>/dev/null; then
-  apt-get update -q
-  apt-get install -y nodejs npm
+  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+  apt-get install -y nodejs
 else
   echo "    node $(node --version) already installed, skipping."
 fi
@@ -35,11 +35,13 @@ rsync -a --exclude='.git' --exclude='node_modules' --exclude='data' --exclude='.
 
 echo "==> Installing npm dependencies..."
 cd "$INSTALL_DIR"
-npm install --production --silent
+npm ci --omit=dev
 
 echo "==> Preparing data directory..."
 mkdir -p "$INSTALL_DIR/data"
 chown -R www-data:www-data "$INSTALL_DIR"
+chmod 750 "$INSTALL_DIR/data"
+[ -f "$INSTALL_DIR/data/history.json" ] && chmod 640 "$INSTALL_DIR/data/history.json"
 
 echo "==> Installing systemd service..."
 cp "$INSTALL_DIR/deploy/cesu.service" "/etc/systemd/system/${SERVICE_NAME}.service"
@@ -67,7 +69,7 @@ cp "$INSTALL_DIR/deploy/nginx-cesu.conf" "$NGINX_SNIPPET"
 
 if [[ -f "$BRUNO_CONF" ]]; then
   if grep -q "cesu_location" "$BRUNO_CONF"; then
-    sed -i "s|include .*/cesu_location.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
+    sed -i "s|include .\+cesu_location\.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
     echo "    Updated include path in $BRUNO_CONF"
   else
     sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/cesu_location.conf;' "$BRUNO_CONF"

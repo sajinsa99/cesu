@@ -1,10 +1,7 @@
 'use strict';
 
 const { getHolidays } = require('./holidays');
-
-function daysInMonth(year, month) {
-  return new Date(year, month, 0).getDate();
-}
+const { daysInMonth } = require('./constants');
 
 function getWeekdayOccurrences(year, month, weekday) {
   // weekday: 0=Sun … 6=Sat (JS Date convention)
@@ -61,4 +58,4 @@ async function calculateSalary({ month, year, salaryNett, nbAbsentDays, transpor
   };
 }
 
-module.exports = { calculateSalary };
+module.exports = { calculateSalary, daysInMonth };

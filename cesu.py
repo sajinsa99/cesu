@@ -19,6 +19,7 @@ import argparse
 import calendar
 import re
 import sys
+import time
 from datetime import datetime
 from math import ceil
 from pathlib import Path
@@ -29,6 +30,7 @@ import json
 
 # Constantes
 ICS_DEFAULT_URL = 'https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics'
+ICS_TTL_SECONDS = 30 * 24 * 60 * 60  # 30 days
 
 
 def download_ics_file(url, destination):
@@ -80,12 +82,19 @@ def parse_ics_holidays(ics_file, year, month):
     """
     holidays = []
 
-    # Téléchargement du fichier s'il n'existe pas localement
-    if not Path(ics_file).exists():
-        print(f"Fichier ICS '{ics_file}' introuvable localement.")
+    ics_path = Path(ics_file)
+    needs_refresh = not ics_path.exists()
+    if not needs_refresh:
+        age = time.time() - ics_path.stat().st_mtime
+        needs_refresh = age > ICS_TTL_SECONDS
+
+    if needs_refresh:
+        print(f"Fichier ICS '{ics_file}' absent ou périmé, téléchargement en cours...")
         if not download_ics_file(ICS_DEFAULT_URL, ics_file):
-            print("Poursuite du calcul sans les données de jours fériés.", file=sys.stderr)
-            return []
+            if not ics_path.exists():
+                print("Poursuite du calcul sans les données de jours fériés.", file=sys.stderr)
+                return []
+            print("Utilisation du fichier ICS périmé.", file=sys.stderr)
 
     try:
         with open(ics_file, 'r', encoding='utf-8') as f:
@@ -390,32 +399,50 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
     if sys.stdin.isatty() and not args.json and not args.quiet:
         current_year = datetime.now().year
 
-        def prompt(label, default, cast, validator=None):
-            try:
-                raw = input(f"{label} [{default}] : ").strip()
-                value = cast(raw) if raw else default
-                if validator:
-                    validator(value)
-                return value
-            except (ValueError, EOFError):
-                return default
+        def prompt(label, default, cast, validate=None):
+            while True:
+                try:
+                    raw = input(f"{label} [{default}] : ").strip()
+                    value = cast(raw) if raw else default
+                    if validate:
+                        validate(value)
+                    return value
+                except EOFError:
+                    return default
+                except ValueError as exc:
+                    print(f"  Valeur invalide : {exc}. Réessayez.", file=sys.stderr)
+
+        def validate_month(v):
+            if not (1 <= v <= 12):
+                raise ValueError("le mois doit être entre 1 et 12")
+
+        def validate_year(v):
+            if not (1900 <= v <= 2100):
+                raise ValueError("l'année doit être entre 1900 et 2100")
+
+        def validate_salary(v):
+            if v <= 0:
+                raise ValueError("le salaire doit être supérieur à 0")
+
+        def validate_absent(v):
+            if v < 0:
+                raise ValueError("les jours d'absence ne peuvent pas être négatifs")
+
+        def validate_transport(v):
+            if v < 0:
+                raise ValueError("l'indemnité de transport ne peut pas être négative")
 
         if args.month is _UNSET:
-            args.month = prompt('Mois (1-12)', datetime.now().month, int,
-                                lambda v: (_ for _ in ()).throw(ValueError()) if not (1 <= v <= 12) else None)
+            args.month = prompt('Mois (1-12)', datetime.now().month, int, validate_month)
         if args.year is _UNSET:
-            entered = prompt(f'Année (ex: {current_year})', current_year, int,
-                             lambda v: (_ for _ in ()).throw(ValueError()) if not (1900 <= v <= 2100) else None)
+            entered = prompt(f'Année (ex: {current_year})', current_year, int, validate_year)
             args.year = None if entered == current_year else entered
         if args.salary_nett is _UNSET:
-            args.salary_nett = prompt('Salaire horaire net (€)', 12.0, float,
-                                      lambda v: (_ for _ in ()).throw(ValueError()) if v <= 0 else None)
+            args.salary_nett = prompt('Salaire horaire net (€)', 12.0, float, validate_salary)
         if args.nb_absent_days is _UNSET:
-            args.nb_absent_days = prompt("Jours d'absence", 0, int,
-                                         lambda v: (_ for _ in ()).throw(ValueError()) if v < 0 else None)
+            args.nb_absent_days = prompt("Jours d'absence", 0, int, validate_absent)
         if args.transport is _UNSET:
-            args.transport = prompt('Indemnité de transport (€)', 60.0, float,
-                                    lambda v: (_ for _ in ()).throw(ValueError()) if v < 0 else None)
+            args.transport = prompt('Indemnité de transport (€)', 60.0, float, validate_transport)
 
     # Appliquer les valeurs par défaut pour les paramètres non fournis et non promptés
     if args.month is _UNSET:
