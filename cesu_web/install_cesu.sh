@@ -72,6 +72,9 @@ if [[ -f "$BRUNO_CONF" ]]; then
   if grep -q "cesu_location" "$BRUNO_CONF"; then
     sed -i "s|include .\+cesu_location\.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
     echo "    Updated include path in $BRUNO_CONF"
+    if grep -q "location /cesu" "$BRUNO_CONF"; then
+      echo "    WARNING: a raw 'location /cesu' block also exists in $BRUNO_CONF — remove it to avoid duplicate location error." >&2
+    fi
   elif grep -q "location /cesu" "$BRUNO_CONF"; then
     echo "    WARNING: a '/cesu' location block already exists in $BRUNO_CONF — skipping inject." >&2
   else
