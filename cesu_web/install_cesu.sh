@@ -13,7 +13,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo "==> Checking Node.js..."
-if ! command -v node &>/dev/null; then
+NODE_MAJOR=$(node --version 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
+if ! command -v node &>/dev/null || [[ ${NODE_MAJOR:-0} -lt 20 ]]; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   apt-get install -y nodejs
 else
@@ -71,6 +72,8 @@ if [[ -f "$BRUNO_CONF" ]]; then
   if grep -q "cesu_location" "$BRUNO_CONF"; then
     sed -i "s|include .\+cesu_location\.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
     echo "    Updated include path in $BRUNO_CONF"
+  elif grep -q "location /cesu" "$BRUNO_CONF"; then
+    echo "    WARNING: a '/cesu' location block already exists in $BRUNO_CONF — skipping inject." >&2
   else
     sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/cesu_location.conf;' "$BRUNO_CONF"
     echo "    Injected cesu include into $BRUNO_CONF"
