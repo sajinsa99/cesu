@@ -69,7 +69,15 @@ mkdir -p /etc/nginx/snippets
 cp "$INSTALL_DIR/deploy/nginx-cesu.conf" "$NGINX_SNIPPET"
 
 if [[ -f "$BRUNO_CONF" ]]; then
-  if grep -q "cesu_location" "$BRUNO_CONF"; then
+  if grep -q '\*_location\.conf' "$BRUNO_CONF"; then
+    # Wildcard include already covers cesu_location.conf — remove any explicit include to avoid duplicates
+    if grep -q "cesu_location" "$BRUNO_CONF"; then
+      sed -i '/cesu_location\.conf/d' "$BRUNO_CONF"
+      echo "    Removed redundant explicit cesu include (wildcard *_location.conf already covers it)"
+    else
+      echo "    Wildcard *_location.conf already present — no changes needed"
+    fi
+  elif grep -q "cesu_location" "$BRUNO_CONF"; then
     sed -i "s|include .\+cesu_location\.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
     echo "    Updated include path in $BRUNO_CONF"
     if grep -q "location /cesu" "$BRUNO_CONF"; then
