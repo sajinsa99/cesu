@@ -11,7 +11,8 @@
     "helmet": "^8.0.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": "20.20.2",
+    "npm": "10.8.2"
   },
   "license": "MIT"
 }
