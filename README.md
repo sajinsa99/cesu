@@ -149,7 +149,7 @@ python3 cesu.py --help
 
 Le fichier ICS est automatiquement téléchargé depuis :
 
-```
+```text
 https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics
 ```
 
@@ -261,4 +261,4 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ---
 
-*Développé avec Python*
+Développé avec Python
