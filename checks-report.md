@@ -1,31 +1,29 @@
-# Checks Report — cesu — 2026-11-12 15:48:07
+# Checks Report — cesu — 2026-11-12 16:00:32
 
 ## Summary
 
 | Check | Status |
 |---|---|
-| shellcheck  cesu_web/install_cesu.sh | ❌ FAIL |
+| shellcheck  install.sh | ✅ PASS |
 | jsonlint  cesu_web/package.json | ✅ PASS |
-| markdownlint-cli2  Markdown files | ❌ FAIL |
+| markdownlint-cli2  Markdown files | ✅ PASS |
 | eslint  (no eslint.config.js found — create one to enable) | ⏭ SKIP |
 | yamllint  YAML files | ✅ PASS |
 | semgrep  cesu.py + cesu_web JS sources | ✅ PASS |
 | trivy  HIGH/CRITICAL CVEs | ✅ PASS |
 | gitleaks  secrets in repo | ✅ PASS |
 | detect-secrets  (run: detect-secrets scan > .secrets.baseline  to create baseline) | ⏭ SKIP |
-| **Total** | PASS: 5 · FAIL: 2 · SKIP: 2 |
+| **Total** | PASS: 7 · FAIL: 0 · SKIP: 2 |
 
 ---
 
 ## Shell
 
-### `shellcheck  cesu_web/install_cesu.sh`
+### `shellcheck  install.sh`
 
-**Status:** ❌ FAIL (exit 2)
+**Status:** ✅ PASS
 
-```
-cesu_web/install_cesu.sh: cesu_web/install_cesu.sh: openBinaryFile: does not exist (No such file or directory)
-```
+_no output_
 
 ---
 
@@ -62,18 +60,13 @@ cesu_web/install_cesu.sh: cesu_web/install_cesu.sh: openBinaryFile: does not exi
 
 ### `markdownlint-cli2  Markdown files`
 
-**Status:** ❌ FAIL (exit 1)
+**Status:** ✅ PASS
 
 ```
 markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
 Finding: ./README.md ./2026_02.md ./2026_03.md ./cesu_web/README.md ./CLAUDE.md ./2026_04.md ./2026_05.md
 Linting: 7 files
-Attempted: 126 fixes in 7 files
-Summary: 4 issues in 1 file
-README.md:230:7 error MD060/table-column-style Table column style [Table pipe does not align with header for style "aligned"]
-README.md:230:23 error MD060/table-column-style Table column style [Table pipe does not align with header for style "aligned"]
-README.md:231:7 error MD060/table-column-style Table column style [Table pipe does not align with header for style "aligned"]
-README.md:231:74 error MD060/table-column-style Table column style [Table pipe does not align with header for style "aligned"]
+Summary: 0 issues in 0 files
 ```
 
 ---
@@ -145,14 +138,14 @@ See https://semgrep.dev/docs/reporting-false-negatives/
 **Status:** ✅ PASS
 
 ```
-2026-11-12T14:47:58Z	INFO	[vulndb] Need to update DB
-2026-11-12T14:47:58Z	INFO	[vulndb] Downloading vulnerability DB...
-2026-11-12T14:47:58Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
-21.40 MiB / 133.50 MiB [--------->__________________________________________________] 16.03% ? p/s ?53.93 MiB / 133.50 MiB [------------------------>___________________________________] 40.40% ? p/s ?88.42 MiB / 133.50 MiB [--------------------------------------->____________________] 66.23% ? p/s ?125.73 MiB / 133.50 MiB [------------------------------------------>__] 94.18% 173.88 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 173.88 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 173.88 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.50 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.50 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.50 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 152.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 152.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 152.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.08 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.08 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.08 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.85 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.85 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.85 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.21 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.21 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.21 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.14 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.14 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.14 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.58 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.58 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.58 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 102.51 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [-----------------------------------------------] 100.00% 24.71 MiB p/s 5.6s2026-11-12T14:48:04Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
-2026-11-12T14:48:04Z	INFO	[vuln] Vulnerability scanning is enabled
-2026-11-12T14:48:04Z	INFO	[npm] Run "npm install" to collect the license information of packages	dir="cesu_web/node_modules"
-2026-11-12T14:48:04Z	INFO	Number of language-specific files	num=1
-2026-11-12T14:48:04Z	INFO	[npm] Detecting vulnerabilities...
+2026-11-12T15:00:23Z	INFO	[vulndb] Need to update DB
+2026-11-12T15:00:23Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-11-12T15:00:23Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
+28.43 MiB / 133.50 MiB [------------>_______________________________________________] 21.30% ? p/s ?68.71 MiB / 133.50 MiB [------------------------------>_____________________________] 51.46% ? p/s ?107.39 MiB / 133.50 MiB [----------------------------------------------->___________] 80.44% ? p/s ?133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 174.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 174.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 174.95 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.67 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.67 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 163.67 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 153.11 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 153.11 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 153.11 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.23 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.23 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 143.23 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.99 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.99 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 133.99 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.34 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.34 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 125.34 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.26 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.26 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 117.26 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.69 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.69 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 109.69 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [------------------------------------------->] 100.00% 102.62 MiB p/s ETA 0s133.50 MiB / 133.50 MiB [-----------------------------------------------] 100.00% 24.72 MiB p/s 5.6s2026-11-12T15:00:29Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-11-12T15:00:29Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-12T15:00:29Z	INFO	[npm] Run "npm install" to collect the license information of packages	dir="cesu_web/node_modules"
+2026-11-12T15:00:29Z	INFO	Number of language-specific files	num=1
+2026-11-12T15:00:29Z	INFO	[npm] Detecting vulnerabilities...
 
 Report Summary
 
@@ -182,9 +175,9 @@ Legend:
     ○ ░
     ░    gitleaks
 
-[90m2:48PM[0m [32mINF[0m [1m38 commits scanned.[0m
-[90m2:48PM[0m [32mINF[0m [1mscanned ~200639 bytes (200.64 KB) in 304ms[0m
-[90m2:48PM[0m [32mINF[0m [1mno leaks found[0m
+[90m3:00PM[0m [32mINF[0m [1m40 commits scanned.[0m
+[90m3:00PM[0m [32mINF[0m [1mscanned ~206686 bytes (206.69 KB) in 330ms[0m
+[90m3:00PM[0m [32mINF[0m [1mno leaks found[0m
 ```
 
 ---
