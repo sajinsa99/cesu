@@ -114,8 +114,8 @@ write_report() {
 # ─────────────────────────────────────────────────────────────────────────────
 
 section "Shell"
-step "shellcheck  cesu_web/install_cesu.sh" \
-  "${DOCKER_RUN[@]}" shellcheck cesu_web/install_cesu.sh
+step "shellcheck  install.sh" \
+  "${DOCKER_RUN[@]}" shellcheck install.sh
 
 section "JSON"
 step "jsonlint  cesu_web/package.json" \
