@@ -23,7 +23,7 @@ Python CLI, not hand-written docs.
 ## Calculation rules (the contract both implementations share)
 
 | Component | Rule |
-|---|---|
+| --- | --- |
 | Base hours | 1 hour per calendar day in the month |
 | Sunday bonus | +1 hour per Sunday (effectively ×2) |
 | Holiday bonus | +1 hour per public holiday **not** falling on a Sunday |
@@ -41,6 +41,7 @@ Both implementations download it themselves if missing.
 ## Commands
 
 ### Python CLI
+
 ```bash
 python3 cesu.py                       # interactive, current month, default values
 python3 cesu.py -q                    # quiet: no prompts, use defaults
@@ -48,21 +49,26 @@ python3 cesu.py -m 6 -s 15 -t 80 -n 2 # month, net hourly salary, transport, abs
 python3 cesu.py -j                    # JSON output
 python3 cesu.py --help
 ```
+
 Key options: `-m/--month`, `-y/--year`, `-s/--salary-nett` (default 12.0), `-n/--nb-absent-days`
 (default 0), `-t/--transport` (default 60.0), `--ics <path>`, `-j/--json`, `-q/--quiet`.
 Exit 0 on success, 1 on error. Result is also written to `YYYY_MM.md`.
 
 ### Web app (from `cesu_web/`)
+
 ```bash
 cd cesu_web && npm install
 cd cesu_web && npm start              # node server.js, listens on 127.0.0.1:PORT (default 4000) at BASE_PATH (default /cesu)
 ```
+
 There is **no test suite** in this repo.
 
 ### Linting / checks
+
 ```bash
 bash checks.sh                        # runs all linters/scanners in the xmk_linters Docker image → checks-report.md
 ```
+
 `checks.sh` requires Docker (internal SAP image) and runs pylint, eslint, markdownlint, semgrep,
 trivy, gitleaks, etc.
 
@@ -82,13 +88,14 @@ trivy, gitleaks, etc.
 ### API (all under `BASE_PATH`, default `/cesu`)
 
 | Method | URL | Description |
-|--------|-----|-------------|
-| GET  | `/healthz` | Liveness `{ ok, uptime }` |
+| -------- | ----- | ------------- |
+| GET | `/healthz` | Liveness `{ ok, uptime }` |
 | POST | `/api/calculate` | Compute + persist a month (rejects past months) |
-| GET  | `/api/history` | Full history list |
+| GET | `/api/history` | Full history list |
 | DELETE | `/api/history/:key` | Delete one month by `YYYY-MM` (rejects past months) |
 
 ### Deployment
+
 `install.sh` (run as **root**) deploys `cesu_web/` to `/opt/cesu_web`, runs `npm install --production`,
 installs the `cesu_web/deploy/cesu.service` systemd unit (runs as `www-data`, port 4000), drops the
 `cesu_web/deploy/nginx-cesu.conf` snippet into `/etc/nginx/snippets/cesu_location.conf`, and injects
@@ -96,6 +103,7 @@ the `include` into the nginx vhost `/etc/nginx/sites-available/bruno` at `/cesu/
 is backed up before overwrite. Configurable via `/opt/cesu_web/.env` (`PORT`, `BASE_PATH`).
 
 ## Conventions
+
 - Python targets 3.6+ and uses the **standard library only** — don't add third-party Python deps.
 - `cesu_web/` is pinned to Node 20.20.2 / npm 10.8.2 (see `package.json` engines and `.nvmrc`);
   dependencies are only `express` and `helmet`.

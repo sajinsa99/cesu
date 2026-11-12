@@ -20,7 +20,7 @@ Interface web pour le calcul automatisé du salaire mensuel CESU (Chèque Emploi
 ## Stack
 
 | Composant | Technologie |
-|-----------|-------------|
+| ----------- | ------------- |
 | Backend | Node.js + Express |
 | Frontend | HTML / CSS / JS vanilla |
 | Déploiement | systemd + nginx (reverse proxy) |
@@ -164,7 +164,7 @@ cesu_web/
 ## Règles de calcul
 
 | Composante | Règle |
-|---|---|
+| --- | --- |
 | Heures de base | 1 heure par jour calendaire |
 | Majoration dimanche | +1 heure par dimanche (soit ×2) |
 | Majoration jour férié | +1 heure par jour férié ne tombant pas un dimanche |

@@ -42,7 +42,7 @@ Le script prend en compte :
 ## Fonctionnalités
 
 | Fonctionnalité | Description |
-|----------------|-------------|
+| ---------------- | ------------- |
 | **Calendrier dynamique** | Détermine automatiquement les jours du mois sélectionné |
 | **Intégration des jours fériés** | Récupère les jours fériés officiels depuis l'API gouvernementale |
 | **Calcul des primes** | Applique les coefficients légaux pour les jours spéciaux |
@@ -103,7 +103,7 @@ python3 cesu.py
 ### Options en ligne de commande
 
 | Option | Forme longue | Défaut | Description |
-|:-------|:-------------|:------:|:------------|
+| :------- | :------------- | :------: | :------------ |
 | `-m` | `--month` | Mois actuel | Mois cible (1-12) |
 | `-y` | `--year` | Année actuelle | Année cible (ex: 2026) |
 | `-s` | `--salary-nett` | `12.0` | Salaire horaire net en euros |
@@ -165,7 +165,7 @@ https://etalab.github.io/jours-feries-france-data/ics/jours_feries_metropole.ics
 Le total des heures facturables est calculé selon les règles suivantes :
 
 | Type de jour | Multiplicateur | Description |
-|:-------------|:--------------:|:------------|
+| :------------- | :--------------: | :------------ |
 | Jour normal | ×1 | Taux de base : 1 heure par jour calendaire |
 | Dimanche | ×2 | Taux doublé appliqué (+1 heure de prime) |
 | Jour férié | ×2 | Taux doublé appliqué (+1 heure de prime) |
@@ -235,7 +235,7 @@ Résultat sauvegardé dans 2026_06.md
 ## Fichiers
 
 | Fichier | Description |
-|:--------|:------------|
+| :-------- | :------------ |
 | `cesu.py` | Script Python pour le calcul du salaire |
 | `jours_feries_metropole.ics` | Jours fériés français (format ICS, téléchargé automatiquement) |
 | `AAAA_MM.md` | Résultat du calcul (ex: `2026_06.md`), généré automatiquement |
