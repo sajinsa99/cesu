@@ -413,11 +413,11 @@ Pour plus d'informations, consultez : https://github.com/your-repo/cesu-calculat
                     print(f"  Valeur invalide : {exc}. Réessayez.", file=sys.stderr)
 
         def validate_month(v):
-            if not (1 <= v <= 12):
+            if not 1 <= v <= 12:
                 raise ValueError("le mois doit être entre 1 et 12")
 
         def validate_year(v):
-            if not (1900 <= v <= 2100):
+            if not 1900 <= v <= 2100:
                 raise ValueError("l'année doit être entre 1900 et 2100")
 
         def validate_salary(v):
