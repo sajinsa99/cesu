@@ -14,8 +14,8 @@ fi
 
 echo "==> Checking Node.js..."
 NODE_MAJOR=$(node --version 2>/dev/null | sed 's/v\([0-9]*\).*/\1/')
-if ! command -v node &>/dev/null || [[ ${NODE_MAJOR:-0} -lt 20 ]]; then
-  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+if ! command -v node &>/dev/null || [[ ${NODE_MAJOR:-0} -lt 22 ]]; then
+  curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   apt-get install -y nodejs
 else
   echo "    node $(node --version) already installed, skipping."
@@ -93,6 +93,14 @@ else
   echo "  WARNING: $BRUNO_CONF not found. Add manually to your nginx SSL vhost:" >&2
   echo "    include $NGINX_SNIPPET;" >&2
 fi
+
+# Ensure all limit_req_zone definitions are present in nginx http block
+RATE_LIMIT_CONF="/etc/nginx/conf.d/rate_limit.conf"
+cat > "$RATE_LIMIT_CONF" << 'NGINXEOF'
+limit_req_zone $binary_remote_addr zone=global:10m rate=30r/s;
+limit_req_zone $binary_remote_addr zone=auth:10m   rate=5r/m;
+NGINXEOF
+echo "    Updated $RATE_LIMIT_CONF (zones: global, auth)"
 
 nginx -t
 systemctl reload nginx
