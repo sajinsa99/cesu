@@ -1,4 +1,4 @@
-# Checks Report — cesu — 2026-11-13 16:40:54
+# Checks Report — cesu — 2026-11-13 16:42:45
 
 ## Summary
 
@@ -11,13 +11,13 @@
 | htmlhint  HTML files | ✅ PASS |
 | stylelint  CSS files | ✅ PASS |
 | yamllint  YAML files | ✅ PASS |
-| pylint  cesu.py | ❌ FAIL |
+| pylint  cesu.py | ✅ PASS |
 | bandit  cesu.py | ✅ PASS |
 | semgrep  cesu.py + cesu_web JS sources | ✅ PASS |
 | trivy  HIGH/CRITICAL CVEs | ✅ PASS |
 | gitleaks  secrets in repo | ✅ PASS |
 | detect-secrets  (run: detect-secrets scan > .secrets.baseline  to create baseline) | ⏭ SKIP |
-| **Total** | PASS: 10 · FAIL: 1 · SKIP: 2 |
+| **Total** | PASS: 11 · FAIL: 0 · SKIP: 2 |
 
 ---
 
@@ -120,37 +120,12 @@ _no output_
 
 ### `pylint  cesu.py`
 
-**Status:** ❌ FAIL (exit 28)
+**Status:** ✅ PASS
 
 ```
-************* Module cesu
-cesu.py:53:0: C0301: Line too long (147/100) (line-too-long)
-cesu.py:66:0: C0301: Line too long (101/100) (line-too-long)
-cesu.py:146:0: C0301: Line too long (137/100) (line-too-long)
-cesu.py:169:0: C0301: Line too long (147/100) (line-too-long)
-cesu.py:172:0: C0301: Line too long (128/100) (line-too-long)
-cesu.py:190:0: C0301: Line too long (115/100) (line-too-long)
-cesu.py:219:0: C0301: Line too long (126/100) (line-too-long)
-cesu.py:268:0: C0301: Line too long (124/100) (line-too-long)
-cesu.py:291:0: C0301: Line too long (116/100) (line-too-long)
-cesu.py:299:0: C0301: Line too long (104/100) (line-too-long)
-cesu.py:308:0: C0301: Line too long (112/100) (line-too-long)
-cesu.py:323:0: C0301: Line too long (116/100) (line-too-long)
-cesu.py:416:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
-cesu.py:420:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
-cesu.py:65:11: W0718: Catching too general exception Exception (broad-exception-caught)
-cesu.py:70:0: R0914: Too many local variables (16/15) (too-many-locals)
-cesu.py:119:11: W0718: Catching too general exception Exception (broad-exception-caught)
-cesu.py:146:0: R0913: Too many arguments (7/5) (too-many-arguments)
-cesu.py:146:0: R0917: Too many positional arguments (7/5) (too-many-positional-arguments)
-cesu.py:146:0: R0914: Too many local variables (22/15) (too-many-locals)
-cesu.py:320:4: C0103: Variable name "_UNSET" doesn't conform to snake_case naming style (invalid-name)
-cesu.py:492:11: W0718: Catching too general exception Exception (broad-exception-caught)
-cesu.py:318:0: R0912: Too many branches (18/12) (too-many-branches)
-cesu.py:318:0: R0915: Too many statements (76/50) (too-many-statements)
 
------------------------------------
-Your code has been rated at 8.87/10
+------------------------------------
+Your code has been rated at 10.00/10
 ```
 
 ---
@@ -167,7 +142,7 @@ Your code has been rated at 8.87/10
 [main]	INFO	running on Python 3.14.4
 [manager]	ERROR	Exception occurred when executing tests against ./cesu.py.
 [manager]	ERROR	Run "bandit --debug ./cesu.py" to see the full traceback.
-Run started:2026-11-13 15:40:40.551980
+Run started:2026-11-13 15:42:32.536932
 
 Test results:
 	No issues identified.
@@ -241,14 +216,14 @@ See https://semgrep.dev/docs/reporting-false-negatives/
 **Status:** ✅ PASS
 
 ```
-2026-11-13T15:40:46Z	INFO	[vulndb] Need to update DB
-2026-11-13T15:40:46Z	INFO	[vulndb] Downloading vulnerability DB...
-2026-11-13T15:40:46Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
-21.94 MiB / 133.77 MiB [--------->__________________________________________________] 16.40% ? p/s ?55.29 MiB / 133.77 MiB [------------------------>___________________________________] 41.33% ? p/s ?87.36 MiB / 133.77 MiB [--------------------------------------->____________________] 65.31% ? p/s ?120.43 MiB / 133.77 MiB [---------------------------------------->____] 90.02% 164.07 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 164.07 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 164.07 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 154.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 154.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 154.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 144.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 144.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 144.92 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 135.57 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 135.57 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 135.57 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 126.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 126.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 126.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 118.65 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 118.65 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 118.65 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 110.99 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 110.99 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 110.99 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 103.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 103.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 103.83 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [-----------------------------------------------] 100.00% 25.60 MiB p/s 5.4s2026-11-13T15:40:52Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
-2026-11-13T15:40:52Z	INFO	[vuln] Vulnerability scanning is enabled
-2026-11-13T15:40:52Z	INFO	[npm] Run "npm install" to collect the license information of packages	dir="cesu_web/node_modules"
-2026-11-13T15:40:52Z	INFO	Number of language-specific files	num=1
-2026-11-13T15:40:52Z	INFO	[npm] Detecting vulnerabilities...
+2026-11-13T15:42:37Z	INFO	[vulndb] Need to update DB
+2026-11-13T15:42:37Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-11-13T15:42:37Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
+17.78 MiB / 133.77 MiB [------->____________________________________________________] 13.29% ? p/s ?53.55 MiB / 133.77 MiB [------------------------>___________________________________] 40.03% ? p/s ?80.34 MiB / 133.77 MiB [------------------------------------>_______________________] 60.06% ? p/s ?117.01 MiB / 133.77 MiB [--------------------------------------->_____] 87.47% 165.40 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 165.40 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 165.40 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 156.52 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 156.52 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 156.52 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 146.43 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 146.43 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 146.43 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 136.98 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 136.98 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 136.98 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 128.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 128.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 128.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 119.88 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 119.88 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 119.88 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 112.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 112.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 112.14 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 104.91 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 104.91 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [------------------------------------------->] 100.00% 104.91 MiB p/s ETA 0s133.77 MiB / 133.77 MiB [-----------------------------------------------] 100.00% 25.12 MiB p/s 5.5s2026-11-13T15:42:43Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-11-13T15:42:43Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-13T15:42:43Z	INFO	[npm] Run "npm install" to collect the license information of packages	dir="cesu_web/node_modules"
+2026-11-13T15:42:43Z	INFO	Number of language-specific files	num=1
+2026-11-13T15:42:43Z	INFO	[npm] Detecting vulnerabilities...
 
 Report Summary
 
@@ -278,9 +253,9 @@ Legend:
     ○ ░
     ░    gitleaks
 
-[90m3:40PM[0m [32mINF[0m [1m47 commits scanned.[0m
-[90m3:40PM[0m [32mINF[0m [1mscanned ~216637 bytes (216.64 KB) in 252ms[0m
-[90m3:40PM[0m [32mINF[0m [1mno leaks found[0m
+[90m3:42PM[0m [32mINF[0m [1m49 commits scanned.[0m
+[90m3:42PM[0m [32mINF[0m [1mscanned ~223878 bytes (223.88 KB) in 248ms[0m
+[90m3:42PM[0m [32mINF[0m [1mno leaks found[0m
 ```
 
 ---
